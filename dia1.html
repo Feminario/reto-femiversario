@@ -287,6 +287,10 @@ function calcular(){
   const desc=document.getElementById('result-desc');
   if(total>0){
     el.innerHTML=fmt(total); desc.style.display='block'; save('femi_d1_numero',total);
+    ['v1','v2','v3','v4','v5','v6','v7','v8'].forEach(id=>{
+      const val=document.getElementById(id).value;
+      if(val) save('femi_d1_'+id, val);
+    });
   } else {
     el.innerHTML='<span class="result-empty">Llena las categorías, aparece acá</span>'; desc.style.display='none';
   }
@@ -332,13 +336,15 @@ function guardar(){
 window.addEventListener('load',()=>{
   const nombre=load('femi_nombre');
   if(nombre) document.getElementById('nombre-input').value=nombre;
-  const n=parseFloat(load('femi_d1_numero'))||0;
+  // Restaurar valores individuales de las categorías
+  let alguno=false;
+  ['v1','v2','v3','v4','v5','v6','v7','v8'].forEach(id=>{
+    const val=load('femi_d1_'+id);
+    if(val){document.getElementById(id).value=val;alguno=true;}
+  });
+  if(alguno) calcular();
   const r=load('femi_d1_reflexion');
   if(r) document.getElementById('reflection').value=r;
-  if(n>0){
-    document.getElementById('result-amount').innerHTML=fmt(n);
-    document.getElementById('result-desc').style.display='block';
-  }
   if(load('femi_d1_listo')==='1'){
     const btn=document.getElementById('save-btn');
     btn.textContent='✓ ¡Día 1 completado! +1 punto';
