@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --azul:#7E84AE;--azul-l:#C2CBFF;--lila:#CEA2DD;--menta:#DFF3AF;
+  --naranja:#F59356;--crema:#FFEAD2;--crema-l:#FFF7EF;
+  --lila-l:#F9E1FF;--dorado:#F7C175;
+  --texto:#2B2040;--muted:#6B6080;--border:rgba(126,132,174,0.2);
+}
+body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-serif;min-height:100vh;padding-bottom:48px;}
+
+.progress-bar-wrap{position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(126,132,174,.08);}
+.progress-label{font-size:11px;font-weight:700;color:var(--azul);white-space:nowrap;}
+.progress-track{flex:1;height:8px;background:var(--crema);border-radius:8px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--azul) 0%,var(--lila) 100%);transition:width .6s cubic-bezier(.4,0,.2,1);}
+.progress-pts{font-size:12px;font-weight:700;color:var(--azul);white-space:nowrap;min-width:36px;text-align:right;}
+
+.day-chips{display:flex;gap:4px;padding:0 16px 8px;background:white;justify-content:center;border-bottom:1px solid var(--border);}
+.chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .3s;}
+.chip.done{background:var(--azul);border-color:var(--azul);color:white;}
+.chip.active{border-color:var(--naranja);color:var(--naranja);}
+
+.header{background:linear-gradient(135deg,#4a5280 0%,var(--azul) 60%,#9b72b8 100%);padding:20px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:var(--crema-l);border-radius:20px 20px 0 0;}
+.logo-text{font-size:20px;font-weight:700;color:white;letter-spacing:.04em;}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.65);letter-spacing:.05em;margin-top:2px;margin-bottom:14px;}
+.header-pill{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:10px;color:white;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.header-title{font-size:clamp(20px,5vw,30px);font-weight:700;color:white;line-height:1.2;margin-bottom:6px;}
+.header-title em{font-style:italic;font-weight:400;color:var(--dorado);}
+.header-sub-text{font-size:12px;color:rgba(255,255,255,.8);}
+
+.content{max-width:600px;margin:0 auto;padding:20px 16px 0;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(126,132,174,.06);}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul);margin-bottom:6px;}
+.card-title{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:10px;line-height:1.3;}
+.card-body{font-size:13px;color:var(--muted);line-height:1.8;}
+.card-body strong{color:var(--texto);font-weight:600;}
+.callout{background:var(--lila-l);border-left:3px solid var(--lila);border-radius:0 10px 10px 0;padding:14px 16px;margin-top:14px;font-size:13px;color:var(--texto);line-height:1.7;font-weight:500;}
+
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+@media(max-width:420px){.input-grid{grid-template-columns:1fr;}}
+.input-group{display:flex;flex-direction:column;gap:5px;}
+.input-label{font-size:11px;color:var(--muted);font-weight:600;}
+.input-hint{font-size:10px;color:#c0bbd0;}
+.calc-input{background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;width:100%;transition:border-color .15s;-moz-appearance:textfield;}
+.calc-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.calc-input:focus{outline:none;border-color:var(--azul);background:white;}
+.calc-input::placeholder{color:#c0bbd0;font-weight:400;}
+
+/* BIG NUMBER */
+.resultado-grande{display:none;margin-top:18px;}
+.resultado-grande.visible{display:block;animation:pop .5s cubic-bezier(.4,0,.2,1);}
+@keyframes pop{from{transform:scale(.92);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+.num-box{background:linear-gradient(135deg,#4a5280 0%,var(--azul) 100%);border-radius:16px;padding:24px 20px;text-align:center;color:white;margin-bottom:10px;}
+.num-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:8px;}
+.num-valor{font-size:clamp(28px,7vw,46px);font-weight:700;color:var(--dorado);line-height:1;margin-bottom:6px;letter-spacing:-0.5px;}
+.num-desc{font-size:12px;color:rgba(255,255,255,.8);}
+
+/* COMPARADOR 3 ESCENARIOS */
+.escenarios{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+@media(max-width:420px){.escenarios{grid-template-columns:1fr;}}
+.escenario{background:white;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+.esc-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.esc-num{font-size:16px;font-weight:700;color:var(--azul);margin-bottom:3px;}
+.esc-desc{font-size:10px;color:var(--muted);line-height:1.4;}
+
+/* CONEXIÓN CON DÍAS ANTERIORES */
+.conexion-card{background:linear-gradient(135deg,var(--crema) 0%,var(--lila-l) 100%);border:1.5px solid var(--lila);border-radius:14px;padding:18px;margin-top:10px;}
+.conexion-title{font-size:12px;font-weight:700;color:var(--azul);margin-bottom:10px;}
+.conexion-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(126,132,174,.12);}
+.conexion-row:last-child{border-bottom:none;}
+.con-label{font-size:12px;color:var(--muted);}
+.con-val{font-size:13px;font-weight:700;color:var(--texto);}
+
+.reflection-area{width:100%;background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.7;resize:vertical;min-height:80px;margin-top:12px;transition:border-color .15s;}
+.reflection-area:focus{outline:none;border-color:var(--azul);background:white;}
+.reflection-area::placeholder{color:#c0bbd0;}
+
+.btn-primary{display:block;width:100%;margin-top:12px;padding:14px;background:var(--naranja);border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;}
+.btn-primary:hover{background:#e07d3d;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary.saved{background:#4a9e6e;}
+
+.celebracion{display:none;margin-top:14px;background:linear-gradient(135deg,var(--menta) 0%,var(--crema) 100%);border:2px solid #7abf45;border-radius:16px;padding:20px;}
+.celebracion.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
+.celebracion-emoji{font-size:36px;margin-bottom:8px;text-align:center;}
+.celebracion-title{font-size:16px;font-weight:700;color:#2d5a1a;margin-bottom:6px;text-align:center;}
+.celebracion-sub{font-size:12px;color:#4a7a2a;line-height:1.7;margin-bottom:16px;text-align:center;}
+.wa-steps{display:flex;flex-direction:column;gap:10px;}
+.wa-step-label{font-size:10px;font-weight:700;color:#4a7a2a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.msg-box{background:white;border:1px solid #7abf45;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--texto);line-height:1.7;white-space:pre-line;}
+.btn-copy{display:block;width:100%;margin-top:8px;padding:10px;background:white;border:2px solid #7abf45;border-radius:10px;color:#2d5a1a;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-copy:hover{background:var(--menta);}
+.btn-wa-grupo{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#25D366;border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;}
+.btn-wa-grupo:hover{background:#1db954;}
+
+.card-menta{background:white;border:1.5px solid var(--menta);border-radius:16px;padding:18px 20px;margin-bottom:14px;}
+.menta-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4a7a2a;margin-bottom:6px;}
+.footer{text-align:center;padding:16px 0 0;border-top:1px solid var(--border);margin-top:6px;}
+.day-nav{display:flex;justify-content:space-between;align-items:center;}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);}
+.dot.done{background:var(--azul);}
+.dot.active{background:var(--azul);width:20px;border-radius:3px;}
+.nav-label{font-size:11px;color:var(--muted);font-weight:500;}
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap">
+  <span class="progress-label">Tu progreso</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <span class="progress-pts" id="progress-pts">0/7 ⭐</span>
+</div>
+<div class="day-chips">
+  <div class="chip" id="chip1">1</div><div class="chip" id="chip2">2</div>
+  <div class="chip active" id="chip3">3</div>
+  <div class="chip" id="chip4">4</div><div class="chip" id="chip5">5</div>
+  <div class="chip" id="chip6">6</div><div class="chip" id="chip7">7</div>
+</div>
+
+<div class="header">
+  <div class="logo-text">feminario</div>
+  <div class="logo-sub">el espacio seguro donde las mujeres redefinimos la autonomía económica</div>
+  <div class="header-pill">Reto Feminversario · Día 3 de 7 · 12 de mayo</div>
+  <h1 class="header-title">¿Cuánto vales como <em>activo económico</em>?</h1>
+  <p class="header-sub-text">El número que nunca te dijeron. Hoy lo calculas.</p>
+</div>
+
+<div class="content">
+
+  <div class="card">
+    <div class="card-label">El concepto</div>
+    <div class="card-title">Nadie te enseñó a verte como lo que eres: un activo que genera valor.</div>
+    <p class="card-body">
+      Las empresas calculan su valor. Los inmuebles tienen avalúo. Los fondos de inversión proyectan rendimientos.<br><br>
+      Pero a nosotras nunca nos enseñaron a calcular cuánto vale nuestra capacidad de generar ingresos a lo largo de la vida.<br><br>
+      Hoy lo haces. Y el número suele ser <strong>mucho más grande de lo que imaginas</strong>.
+    </p>
+    <div class="callout">
+      Esto no es lo que tienes hoy. Es lo que eres capaz de generar. Verlo cambia la forma en que tomas decisiones — sobre tu carrera, tus inversiones, tu tiempo.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">El cálculo</div>
+    <div class="card-title">Tres datos. Un número que lo cambia todo.</div>
+    <p class="card-body" style="margin-bottom:4px;">No necesitas saber de finanzas. Solo necesitas estos tres datos.</p>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label class="input-label">💰 Tu salario mensual neto</label>
+        <input class="calc-input" type="number" id="salario" placeholder="$ 0" oninput="calcular()">
+        <span class="input-hint" id="salario-hint"></span>
+      </div>
+      <div class="input-group">
+        <label class="input-label">🎂 Tu edad actual</label>
+        <input class="calc-input" type="number" id="edad" placeholder="ej. 28" min="18" max="65" oninput="calcular()">
+      </div>
+      <div class="input-group">
+        <label class="input-label">🏁 Edad en la que planeas retirarte</label>
+        <input class="calc-input" type="number" id="retiro" placeholder="ej. 60" min="40" max="75" oninput="calcular()">
+      </div>
+      <div class="input-group">
+        <label class="input-label">📈 Incremento salarial anual estimado</label>
+        <input class="calc-input" type="number" id="incremento" placeholder="ej. 5" oninput="calcular()">
+        <span class="input-hint">% promedio anual (Colombia: ~5-8%)</span>
+      </div>
+    </div>
+
+    <!-- RESULTADO GRANDE -->
+    <div class="resultado-grande" id="resultado-grande">
+      <div class="num-box">
+        <div class="num-label">Tu potencial de ingresos en tu vida laboral</div>
+        <div class="num-valor" id="num-base">$0</div>
+        <div class="num-desc" id="num-desc">sin crecimiento salarial</div>
+      </div>
+
+      <div class="escenarios">
+        <div class="escenario">
+          <div class="esc-label">Sin crecimiento</div>
+          <div class="esc-num" id="esc0">$0</div>
+          <div class="esc-desc">Salario plano toda la vida</div>
+        </div>
+        <div class="escenario" style="border-color:var(--azul-l);">
+          <div class="esc-label" style="color:var(--azul);">Con tu % estimado</div>
+          <div class="esc-num" id="esc1" style="color:var(--naranja);">$0</div>
+          <div class="esc-desc" id="esc1-desc">Con incremento anual</div>
+        </div>
+        <div class="escenario" style="border-color:var(--menta);">
+          <div class="esc-label" style="color:#4a7a2a;">Si inviertes el 10%</div>
+          <div class="esc-num" id="esc2" style="color:#4a7a2a;">$0</div>
+          <div class="esc-desc">Capital adicional generado</div>
+        </div>
+      </div>
+
+      <!-- CONEXIÓN CON DÍAS ANTERIORES -->
+      <div class="conexion-card" id="conexion-card">
+        <div class="conexion-title">📊 Tu panorama financiero completo (días 1, 2 y 3)</div>
+        <div class="conexion-row">
+          <span class="con-label">🧭 Tu número de la libertad (mes)</span>
+          <span class="con-val" id="con-libertad">—</span>
+        </div>
+        <div class="conexion-row">
+          <span class="con-label">⏱ Tu hora de vida vale</span>
+          <span class="con-val" id="con-hora">—</span>
+        </div>
+        <div class="conexion-row">
+          <span class="con-label">💼 Tu potencial de ingresos total</span>
+          <span class="con-val" id="con-potencial" style="color:var(--naranja);">—</span>
+        </div>
+        <div class="conexion-row">
+          <span class="con-label">📅 Años de vida laboral que te quedan</span>
+          <span class="con-val" id="con-anos">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFLEXIÓN -->
+  <div class="card" id="reflexion-card" style="display:none;">
+    <div class="card-label">Tu reflexión del día</div>
+    <div class="card-title">¿Qué sientes cuando ves ese número?</div>
+    <p class="card-body">¿Te parece más grande o más pequeño de lo que esperabas? ¿Cambia algo en la forma en que piensas en tu carrera o tus decisiones financieras?</p>
+    <textarea class="reflection-area" id="reflection" placeholder="Escribe tu respuesta acá — nadie más la ve." oninput="guardarTexto()"></textarea>
+    <button class="btn-primary" id="save-btn" onclick="guardar()">✓ Completar el Día 3 y ganar mi punto</button>
+  </div>
+
+  <!-- CELEBRACIÓN -->
+  <div class="celebracion" id="celebracion">
+    <div class="celebracion-emoji">💼</div>
+    <div class="celebracion-title" id="cel-title">¡Ahora sabes lo que vales!</div>
+    <div class="celebracion-sub">Este número existe en tu cabeza para siempre. Cuéntaselo a la comunidad — que todas hagan el cálculo hoy.</div>
+    <div class="wa-steps">
+      <div>
+        <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
+        <div class="msg-box" id="wa-msg">Hice el Día 3 del Reto Feminversario 💼
+
+Calculé cuánto voy a generar con mi trabajo en toda mi vida. El número es mucho más grande de lo que pensaba.
+
+¿Ya hiciste el tuyo?
+#RetoFeminversario</div>
+        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
+      </div>
+      <div>
+        <div class="wa-step-label">Paso 2 · Ábrelo en el grupo</div>
+        <a class="btn-wa-grupo" href="https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN" target="_blank">💬 Abrir grupo del reto en WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-menta" id="manana-card" style="display:none;">
+    <div class="menta-label">Mañana · Día 4</div>
+    <div class="card-title" style="font-size:15px;">El día más importante del reto.</div>
+    <p class="card-body">El día 4 calculas algo que el sistema nunca te mostró: <strong>el hueco de tu pensión</strong>. La diferencia entre lo que recibirías al jubilarte y lo que realmente necesitas. Cuando lo ves con tus propios números, ya no puedes ignorarlo.</p>
+    <p class="card-body" style="margin-top:8px;color:#4a7a2a;font-weight:600;">Si quieres llegar preparada: busca la app o el portal web de tu fondo de pensiones (Colpensiones, Porvenir, Protección, Colfondos, etc.) y ten a mano tu saldo de semanas cotizadas o ahorro acumulado.</p>
+  </div>
+
+  <div class="footer">
+    <div class="day-nav">
+      <span class="nav-label">Día 3</span>
+      <div class="dots">
+        <div class="dot done"></div><div class="dot done"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <span class="nav-label">7 días</span>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:#c0bbd0;">Feminario · Reto Feminversario · Mayo 2026</p>
+  </div>
+</div>
+
+<script>
+function fmt(n){
+  if(n>=1e9) return '$'+(n/1e9).toFixed(1).replace('.',',')+'B';
+  if(n>=1e6) return '$'+(n/1e6).toFixed(0).toLocaleString('es-CO')+'M';
+  return '$\u00a0'+Math.round(n).toLocaleString('es-CO');
+}
+function fmtFull(n){ return '$\u00a0'+Math.round(n).toLocaleString('es-CO'); }
+function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+
+function actualizarProgreso(){
+  const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
+  const pts=dias.filter(d=>load(d)==='1').length;
+  document.getElementById('progress-fill').style.width=(pts/7*100)+'%';
+  document.getElementById('progress-pts').textContent=pts+'/7 ⭐';
+  dias.forEach((d,i)=>{
+    const c=document.getElementById('chip'+(i+1));
+    if(!c) return;
+    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='✓';}
+    else if(i===2 && load(d)!=='1'){c.classList.add('active');}
+  });
+}
+
+function calcularGeometrica(salMensual, anios, tasaAnual){
+  // Suma de serie geométrica: salario anual × ((1+r)^n - 1) / r
+  const salAnual = salMensual * 12;
+  if(tasaAnual === 0) return salAnual * anios;
+  const r = tasaAnual / 100;
+  return salAnual * ((Math.pow(1+r, anios) - 1) / r);
+}
+
+function calcular(){
+  const sal = parseFloat(document.getElementById('salario').value)||0;
+  const edad = parseFloat(document.getElementById('edad').value)||0;
+  const retiro = parseFloat(document.getElementById('retiro').value)||0;
+  const inc = parseFloat(document.getElementById('incremento').value)||0;
+
+  if(sal<=0 || edad<=0 || retiro<=0 || retiro<=edad) return;
+
+  const anios = retiro - edad;
+  const sinCrecimiento = sal * 12 * anios;
+  const conCrecimiento = calcularGeometrica(sal, anios, inc);
+  const conInversion = conCrecimiento + calcularGeometrica(sal*0.10, anios, 8);
+
+  // Mostrar
+  document.getElementById('num-base').textContent = fmt(conCrecimiento > 0 ? conCrecimiento : sinCrecimiento);
+  document.getElementById('num-desc').textContent = inc > 0
+    ? `con ${inc}% de incremento anual · ${anios} años de vida laboral`
+    : `sin crecimiento salarial · ${anios} años de vida laboral`;
+
+  document.getElementById('esc0').textContent = fmt(sinCrecimiento);
+  document.getElementById('esc1').textContent = fmt(conCrecimiento);
+  document.getElementById('esc1-desc').textContent = `Con ${inc>0?inc:0}% anual`;
+  document.getElementById('esc2').textContent = fmt(conInversion - conCrecimiento);
+
+  // Conexión días anteriores
+  const libertad = parseFloat(load('femi_d1_numero'))||0;
+  const hora = parseFloat(load('femi_d2_hora'))||0;
+  document.getElementById('con-libertad').textContent = libertad>0 ? fmtFull(libertad)+'/mes' : 'Completa el Día 1';
+  document.getElementById('con-hora').textContent = hora>0 ? fmtFull(hora)+'/h' : 'Completa el Día 2';
+  document.getElementById('con-potencial').textContent = fmt(conCrecimiento>0?conCrecimiento:sinCrecimiento);
+  document.getElementById('con-anos').textContent = anios+' años';
+
+  // Guardar
+  save('femi_d3_potencial', conCrecimiento>0?conCrecimiento:sinCrecimiento);
+  save('femi_d3_anios', anios);
+  save('femi_d3_salario', sal);
+
+  document.getElementById('resultado-grande').classList.add('visible');
+  document.getElementById('reflexion-card').style.display='block';
+  document.getElementById('manana-card').style.display='block';
+}
+
+function guardarTexto(){ save('femi_d3_reflexion', document.getElementById('reflection').value); }
+
+function copiarMensaje(){
+  const txt=document.getElementById('wa-msg').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const b=document.getElementById('copy-btn');
+    b.textContent='✅ ¡Copiado! Ahora pégalo en el grupo';
+  }).catch(()=>{
+    const r=document.createRange();r.selectNode(document.getElementById('wa-msg'));
+    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+    document.execCommand('copy');
+    document.getElementById('copy-btn').textContent='✅ ¡Copiado!';
+  });
+}
+
+function guardar(){
+  const btn=document.getElementById('save-btn');
+  const pot=load('femi_d3_potencial');
+  if(!pot){
+    btn.textContent='Primero calcula tu potencial arriba ↑';
+    btn.style.background='#b07040';
+    setTimeout(()=>{btn.textContent='✓ Completar el Día 3 y ganar mi punto';btn.style.background='';},2200);
+    return;
+  }
+  save('femi_d3_listo','1');
+  btn.textContent='✓ ¡Día 3 completado! +1 punto';
+  btn.classList.add('saved');
+  actualizarProgreso();
+  const nombre=load('femi_nombre')||'';
+  document.getElementById('cel-title').textContent='¡Ahora sabes lo que vales'+(nombre?', '+nombre:'')+'!';
+  const cel=document.getElementById('celebracion');
+  cel.classList.add('visible');
+  cel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+window.addEventListener('load',()=>{
+  actualizarProgreso();
+  // Pre-llenar salario desde día 2 si existe
+  const salD2=load('femi_d2_salario');
+  if(salD2){
+    document.getElementById('salario').value=salD2;
+    document.getElementById('salario-hint').textContent='Pre-llenado desde el Día 2';
+    document.getElementById('incremento').value=5;
+  }
+  const r=load('femi_d3_reflexion');
+  if(r) document.getElementById('reflection').value=r;
+  // Restaurar si ya calculó
+  const sal=parseFloat(load('femi_d3_salario'))||0;
+  const pot=load('femi_d3_potencial');
+  if(sal && pot){
+    document.getElementById('salario').value=sal;
+    calcular();
+  }
+  if(load('femi_d3_listo')==='1'){
+    const btn=document.getElementById('save-btn');
+    btn.textContent='✓ ¡Día 3 completado! +1 punto';
+    btn.classList.add('saved');
+    const nombre=load('femi_nombre')||'';
+    document.getElementById('cel-title').textContent='¡Ahora sabes lo que vales'+(nombre?', '+nombre:'')+'!';
+    document.getElementById('celebracion').classList.add('visible');
+  }
+});
+</script>
+</body>
+</html>
