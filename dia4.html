@@ -164,7 +164,7 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
     <div class="card-label">El día más importante del reto</div>
     <div class="card-title">Hay una brecha entre lo que recibirías y lo que necesitas. Hoy la mides.</div>
     <p class="card-body">
-      Solo 1 de cada 8 mujeres en Colombia se pensiona. Y las que lo logran descubren que la pensión que reciben no alcanza para vivir como querían.<br><br>
+      La mayoría de las mujeres en Colombia llegan a la jubilación y descubren que la pensión que reciben no alcanza para vivir como querían.<br><br>
       No es mala suerte. Es el resultado acumulado de salarios más bajos, trabajos informales, pausas en la vida laboral para cuidar a otros — y un sistema que no fue diseñado pensando en nosotras.<br><br>
       <strong>Hoy ese problema deja de ser una estadística y se convierte en tu número.</strong>
     </p>
@@ -309,7 +309,7 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
   <div class="celebracion" id="celebracion">
     <div class="celebracion-emoji">⚠️✅</div>
     <div class="celebracion-title" id="cel-title">Ya viste el hueco. Eso ya es un acto de valentía.</div>
-    <div class="celebracion-sub">La mayoría nunca hace este ejercicio. Tú lo hiciste hoy. Cuéntaselo a la comunidad.</div>
+    <div class="celebracion-sub">Este número cambia cómo ves tu futuro. Cuéntaselo a la comunidad — que todas hagan el cálculo hoy.</div>
     <div class="wa-steps">
       <div>
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
@@ -406,7 +406,7 @@ function calcularBrecha(){
     const sal=parseFloat(document.getElementById('sal-col').value)||0;
     if(!semanas||!edad||!sal) return;
     const semanasTotal=semanas + (62-edad)*52; // proyectar cotizando hasta los 62
-    const tasaReem = Math.min(0.65 + (Math.min(semanasTotal,1800)-1300)*0.015/100, 0.80);
+    const tasaReem = Math.min(0.65 + (Math.min(semanasTotal,1800)-1300)*0.015/500, 0.80);
     pensionEstimada = Math.max(sal * tasaReem, 1423500); // mínimo 1 SMMLV
     save('femi_d4_semanas', semanas);
     save('femi_d4_edad', edad);
@@ -415,7 +415,7 @@ function calcularBrecha(){
     const saldo=parseFloat(document.getElementById('saldo').value)||0;
     const edad=parseFloat(document.getElementById('edad-priv').value)||0;
     const sal=parseFloat(document.getElementById('sal-priv').value)||0;
-    if(!saldo||!edad) return;
+    if(!edad||!sal) return;
     // Proyección: saldo actual + aportes futuros (16% sal × meses) hasta retiro 60 años
     const mesesRestantes = Math.max((60-edad)*12, 0);
     const aporteMensual = sal * 0.16;
@@ -433,29 +433,32 @@ function calcularBrecha(){
   mostrarBrecha(pensionEstimada, libertad);
 }
 
+function set(id,prop,val){const el=document.getElementById(id);if(!el)return;if(prop==='text')el.textContent=val;else el.style[prop]=val;}
+function setClass(id,cls){const el=document.getElementById(id);if(el)el.classList.add(cls);}
+
 function mostrarBrecha(pension, libertad){
-  const maxBar = Math.max(pension, libertad) * 1.1;
+  const maxBar = Math.max(pension, libertad, 1) * 1.1;
   const brecha = Math.max(libertad - pension, 0);
   const suficiente = pension >= libertad;
 
-  document.getElementById('brecha-pension').textContent = fmt(pension);
-  document.getElementById('bar-pension-val').textContent = fmt(pension);
-  document.getElementById('bar-libertad-val').textContent = libertad>0 ? fmt(libertad) : 'Completa el Día 1';
-  document.getElementById('bar-pension').style.width = (pension/maxBar*100)+'%';
-  document.getElementById('bar-libertad').style.width = libertad>0 ? (libertad/maxBar*100)+'%' : '70%';
-  document.getElementById('gap-num').textContent = suficiente ? '¡Sin brecha!' : fmt(brecha);
-  document.getElementById('gap-desc').textContent = suficiente
-    ? 'Tu pensión estimada cubre tu número de la libertad. Igual vale la pena seguir construyendo.'
-    : `al mes que necesitarías cubrir con inversiones u otras fuentes. ${libertad===0?'(Completa el Día 1 para ver tu número de la libertad.)':''}`;
-  document.getElementById('gap-num').style.color = suficiente ? '#4a9e6e' : 'var(--rojo)';
-  document.getElementById('gap-alerta').style.borderColor = suficiente ? '#4a9e6e' : 'var(--rojo)';
-  document.getElementById('gap-alerta').style.background = suficiente ? 'rgba(74,158,110,.08)' : 'var(--rojo-l)';
-  document.getElementById('gap-titulo').style.color = suficiente ? '#4a9e6e' : 'var(--rojo)';
-  document.getElementById('gap-titulo').textContent = suficiente ? '✅ Tu situación pensional' : '⚠️ Tu brecha pensional mensual';
+  set('brecha-pension','text',fmt(pension));
+  set('bar-pension-val','text',fmt(pension));
+  set('bar-libertad-val','text',libertad>0?fmt(libertad):'Completa el Día 1');
+  set('bar-pension','width',(pension/maxBar*100)+'%');
+  set('bar-libertad','width',libertad>0?(libertad/maxBar*100)+'%':'70%');
+  set('gap-num','text',suficiente?'¡Sin brecha!':fmt(brecha));
+  set('gap-desc','text',suficiente
+    ?'Tu pensión estimada cubre tu número de la libertad. Igual vale la pena seguir construyendo.'
+    :`al mes que necesitarías cubrir con inversiones u otras fuentes. ${libertad===0?'(Completa el Día 1 para ver tu número de la libertad.)':''}`);
+  set('gap-num','color',suficiente?'#4a9e6e':'var(--rojo)');
+  set('gap-alerta','borderColor',suficiente?'#4a9e6e':'var(--rojo)');
+  set('gap-alerta','background',suficiente?'rgba(74,158,110,.08)':'var(--rojo-l)');
+  set('gap-titulo','color',suficiente?'#4a9e6e':'var(--rojo)');
+  set('gap-titulo','text',suficiente?'✅ Tu situación pensional':'⚠️ Tu brecha pensional mensual');
 
-  document.getElementById('brecha-card').classList.add('visible');
-  document.getElementById('reflexion-card').style.display='block';
-  document.getElementById('manana-card').style.display='block';
+  setClass('brecha-card','visible');
+  const rc=document.getElementById('reflexion-card');if(rc)rc.style.display='block';
+  const mc=document.getElementById('manana-card');if(mc)mc.style.display='block';
 }
 
 function guardarTexto(){save('femi_d4_reflexion',document.getElementById('reflection').value);}
@@ -485,7 +488,7 @@ function guardar(){
   btn.classList.add('saved');
   actualizarProgreso();
   const nombre=load('femi_nombre')||'';
-  document.getElementById('cel-title').textContent='Ya viste el hueco'+(nombre?', '+nombre:'')+'.\nEso ya es un acto de valentía.';
+  document.getElementById('cel-title').textContent='¡Ya viste tu hueco pensional'+(nombre?', '+nombre:'')+'!';
   const cel=document.getElementById('celebracion');
   cel.classList.add('visible');
   cel.scrollIntoView({behavior:'smooth',block:'center'});
@@ -493,16 +496,31 @@ function guardar(){
 
 window.addEventListener('load',()=>{
   actualizarProgreso();
-  const tipo=load('femi_d4_tipo');
   const r=load('femi_d4_reflexion');
   if(r) document.getElementById('reflection').value=r;
-  if(tipo) seleccionarFondo(tipo);
+
+  const tipo=load('femi_d4_tipo');
+  if(tipo){
+    seleccionarFondo(tipo);
+    if(tipo==='colpensiones'){
+      const sem=load('femi_d4_semanas'); if(sem){const el=document.getElementById('semanas');if(el)el.value=sem;}
+      const ed=load('femi_d4_edad');     if(ed){const el=document.getElementById('edad-col');if(el)el.value=ed;}
+      const sal=load('femi_d4_sal');     if(sal){const el=document.getElementById('sal-col');if(el)el.value=sal;}
+    } else {
+      const sld=load('femi_d4_saldo'); if(sld){const el=document.getElementById('saldo');if(el)el.value=sld;}
+      const ed=load('femi_d4_edad');   if(ed){const el=document.getElementById('edad-priv');if(el)el.value=ed;}
+      const sal=load('femi_d4_sal');   if(sal){const el=document.getElementById('sal-priv');if(el)el.value=sal;}
+    }
+    const pension=parseFloat(load('femi_d4_pension'))||0;
+    if(pension>0){ mostrarBrecha(pension, parseFloat(load('femi_d1_numero'))||0); }
+  }
+
   if(load('femi_d4_listo')==='1'){
     const btn=document.getElementById('save-btn');
     btn.textContent='✓ ¡Día 4 completado! +1 punto';
     btn.classList.add('saved');
     const nombre=load('femi_nombre')||'';
-    document.getElementById('cel-title').textContent='Ya viste el hueco'+(nombre?', '+nombre:'')+'.\nEso ya es un acto de valentía.';
+    document.getElementById('cel-title').textContent='¡Ya viste tu hueco pensional'+(nombre?', '+nombre:'')+'!';
     document.getElementById('celebracion').classList.add('visible');
   }
 });
