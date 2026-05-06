@@ -343,6 +343,9 @@ function calcular(){
   save('femi_d3_potencial', conCrecimiento>0?conCrecimiento:sinCrecimiento);
   save('femi_d3_anios', anios);
   save('femi_d3_salario', sal);
+  save('femi_d3_edad', edad);
+  save('femi_d3_retiro', retiro);
+  save('femi_d3_incremento', inc);
 
   document.getElementById('resultado-grande').classList.add('visible');
   document.getElementById('reflexion-card').style.display='block';
@@ -397,9 +400,15 @@ window.addEventListener('load',()=>{
   if(r) document.getElementById('reflection').value=r;
   // Restaurar si ya calculó
   const sal=parseFloat(load('femi_d3_salario'))||0;
+  const edadG=load('femi_d3_edad');
+  const retiroG=load('femi_d3_retiro');
+  const incG=load('femi_d3_incremento');
   const pot=load('femi_d3_potencial');
   if(sal && pot){
     document.getElementById('salario').value=sal;
+    if(edadG) document.getElementById('edad').value=edadG;
+    if(retiroG) document.getElementById('retiro').value=retiroG;
+    if(incG) document.getElementById('incremento').value=incG;
     calcular();
   }
   if(load('femi_d3_listo')==='1'){
