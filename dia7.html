@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --azul:#7E84AE;--azul-l:#C2CBFF;--lila:#CEA2DD;--menta:#DFF3AF;
+  --naranja:#F59356;--crema:#FFEAD2;--crema-l:#FFF7EF;
+  --lila-l:#F9E1FF;--dorado:#F7C175;
+  --texto:#2B2040;--muted:#6B6080;--border:rgba(126,132,174,0.2);
+  --verde:#4a9e6e;--rojo:#E05050;
+}
+body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-serif;min-height:100vh;padding-bottom:48px;}
+
+.progress-bar-wrap{position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(126,132,174,.08);}
+.progress-label{font-size:11px;font-weight:700;color:var(--azul);white-space:nowrap;}
+.progress-track{flex:1;height:8px;background:var(--crema);border-radius:8px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--azul) 0%,var(--lila) 100%);transition:width .6s cubic-bezier(.4,0,.2,1);}
+.progress-pts{font-size:12px;font-weight:700;color:var(--azul);white-space:nowrap;min-width:36px;text-align:right;}
+.day-chips{display:flex;gap:4px;padding:0 16px 8px;background:white;justify-content:center;border-bottom:1px solid var(--border);}
+.chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .3s;}
+.chip.done{background:var(--azul);border-color:var(--azul);color:white;}
+.chip.active{border-color:var(--naranja);color:var(--naranja);}
+
+/* HEADER — Día 7: el más luminoso, llegamos */
+.header{background:linear-gradient(135deg,#0d0620 0%,#1a0840 35%,#6020a0 75%,#c060e0 100%);padding:20px 24px 32px;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 60% 40%,rgba(247,193,117,.18) 0%,transparent 70%);pointer-events:none;}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:var(--crema-l);border-radius:20px 20px 0 0;}
+.logo-text{font-size:20px;font-weight:700;color:white;letter-spacing:.04em;position:relative;}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.65);letter-spacing:.05em;margin-top:2px;margin-bottom:14px;position:relative;}
+.header-pill{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:10px;color:white;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;position:relative;}
+.header-title{font-size:clamp(20px,5vw,30px);font-weight:700;color:white;line-height:1.2;margin-bottom:6px;position:relative;}
+.header-title em{font-style:italic;font-weight:400;color:var(--dorado);}
+.header-sub-text{font-size:12px;color:rgba(255,255,255,.8);position:relative;}
+
+.content{max-width:600px;margin:0 auto;padding:20px 16px 0;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(126,132,174,.06);}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul);margin-bottom:6px;}
+.card-title{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:10px;line-height:1.3;}
+.card-body{font-size:13px;color:var(--muted);line-height:1.8;}
+.card-body strong{color:var(--texto);font-weight:600;}
+
+/* PERFIL TAROT */
+.tarot-card{border-radius:20px;padding:24px 20px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;}
+.tarot-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;opacity:.25;filter:blur(40px);pointer-events:none;}
+.tarot-arcano{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px;opacity:.75;}
+.tarot-simbolo{font-size:56px;margin-bottom:10px;line-height:1;}
+.tarot-nombre{font-size:24px;font-weight:700;margin-bottom:6px;line-height:1.1;}
+.tarot-titulo{font-size:13px;font-weight:600;margin-bottom:12px;opacity:.85;}
+.tarot-descripcion{font-size:12px;line-height:1.8;opacity:.9;max-width:440px;margin:0 auto;}
+.tarot-keywords{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:14px;}
+.tarot-kw{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.2);}
+
+/* PLAN SECTIONS */
+.plan-bloque{background:white;border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;}
+.plan-bloque-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.plan-icono{font-size:20px;flex-shrink:0;}
+.plan-etiqueta{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--azul);}
+.plan-valor{font-size:20px;font-weight:700;color:var(--texto);}
+.plan-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.plan-accion{font-size:12px;color:var(--texto);line-height:1.6;padding:10px 12px;background:var(--crema-l);border-radius:8px;margin-top:8px;border-left:3px solid var(--naranja);}
+
+/* HORIZONTES */
+.horizontes{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px;}
+.horizonte{border-radius:14px;padding:16px;}
+.horizonte-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.horizonte-titulo{font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3;}
+.horizonte-items{display:flex;flex-direction:column;gap:5px;}
+.horizonte-item{font-size:12px;line-height:1.5;padding-left:14px;position:relative;}
+.horizonte-item::before{content:'→';position:absolute;left:0;font-weight:700;}
+
+/* BOTÓN PDF */
+.btn-pdf{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:linear-gradient(135deg,#6020a0,#c060e0);border:none;border-radius:14px;color:white;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;margin-top:4px;}
+.btn-pdf:hover{opacity:.9;}
+.btn-pdf:active{transform:scale(.98);}
+.btn-pdf.generating{opacity:.7;cursor:wait;}
+
+/* CELEBRACIÓN FINAL */
+.celebracion-final{background:linear-gradient(135deg,#0d0620,#2a1060);border-radius:20px;padding:28px 20px;text-align:center;margin-bottom:14px;}
+.celebracion-final-emoji{font-size:44px;margin-bottom:12px;}
+.celebracion-final-titulo{font-size:20px;font-weight:700;color:white;margin-bottom:8px;line-height:1.2;}
+.celebracion-final-titulo em{font-style:italic;color:var(--dorado);}
+.celebracion-final-sub{font-size:12px;color:rgba(255,255,255,.8);line-height:1.8;max-width:420px;margin:0 auto 20px;}
+
+/* WA */
+.celebracion{display:none;margin-top:14px;background:linear-gradient(135deg,var(--menta) 0%,var(--crema) 100%);border:2px solid #7abf45;border-radius:16px;padding:20px;}
+.celebracion.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
+@keyframes pop{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+.celebracion-emoji{font-size:36px;margin-bottom:8px;text-align:center;}
+.celebracion-title{font-size:16px;font-weight:700;color:#2d5a1a;margin-bottom:6px;text-align:center;}
+.celebracion-sub{font-size:12px;color:#4a7a2a;line-height:1.7;margin-bottom:16px;text-align:center;}
+.wa-steps{display:flex;flex-direction:column;gap:10px;}
+.wa-step-label{font-size:10px;font-weight:700;color:#4a7a2a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.msg-box{background:white;border:1px solid #7abf45;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--texto);line-height:1.7;white-space:pre-line;}
+.btn-copy{display:block;width:100%;margin-top:8px;padding:10px;background:white;border:2px solid #7abf45;border-radius:10px;color:#2d5a1a;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-copy:hover{background:var(--menta);}
+.btn-wa-grupo{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#25D366;border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;}
+.btn-wa-grupo:hover{background:#1db954;}
+.btn-primary{display:block;width:100%;margin-top:12px;padding:14px;background:var(--naranja);border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;}
+.btn-primary:hover{background:#e07d3d;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary.saved{background:var(--verde);}
+.footer{text-align:center;padding:16px 0 0;border-top:1px solid var(--border);margin-top:6px;}
+.day-nav{display:flex;justify-content:space-between;align-items:center;}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);}
+.dot.done{background:var(--azul);}
+.dot.active{background:var(--azul);width:20px;border-radius:3px;}
+.nav-label{font-size:11px;color:var(--muted);font-weight:500;}
+
+/* PDF hidden layer */
+#pdf-layer{position:fixed;left:-9999px;top:0;width:800px;background:white;font-family:'Montserrat',sans-serif;}
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap">
+  <span class="progress-label">Tu progreso</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <span class="progress-pts" id="progress-pts">0/7 &#11088;</span>
+</div>
+<div class="day-chips">
+  <div class="chip" id="chip1">1</div><div class="chip" id="chip2">2</div>
+  <div class="chip" id="chip3">3</div><div class="chip" id="chip4">4</div>
+  <div class="chip" id="chip5">5</div><div class="chip" id="chip6">6</div>
+  <div class="chip active" id="chip7">7</div>
+</div>
+
+<div class="header">
+  <div class="logo-text">feminario</div>
+  <div class="logo-sub">el espacio seguro donde las mujeres redefinimos la autonomía económica</div>
+  <div class="header-pill">Reto Feminversario &middot; D&iacute;a 7 de 7 &middot; 16 de mayo</div>
+  <h1 class="header-title">Tu <em>Plan Feminario</em></h1>
+  <p class="header-sub-text">Siete d&iacute;as. Siete n&uacute;meros. Un plan que ahora es tuyo.</p>
+</div>
+
+<div class="content">
+
+  <!-- PERFIL TAROT -->
+  <div id="tarot-section"></div>
+
+  <!-- PLAN COMPLETO -->
+  <div class="card">
+    <div class="card-label">Tu radiograf&iacute;a financiera</div>
+    <div class="card-title" id="plan-titulo">Tu Plan Feminario</div>
+    <div id="plan-bloques"></div>
+  </div>
+
+  <!-- HORIZONTES -->
+  <div class="card">
+    <div class="card-label">Tu hoja de ruta</div>
+    <div class="card-title">Tres horizontes. Tres versiones de ti.</div>
+    <div class="horizontes" id="horizontes"></div>
+  </div>
+
+  <!-- BOTÓN DESCARGAR PDF -->
+  <button class="btn-pdf" id="btn-pdf" onclick="generarPDF()">
+    <span style="font-size:20px;">&#128196;</span>
+    Descargar mi Plan Feminario en PDF
+  </button>
+  <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px;margin-bottom:14px;">Tu plan personalizado &middot; Para guardar, imprimir o compartir</p>
+
+  <!-- GUARDAR DÍA -->
+  <div class="card" id="reflexion-card">
+    <div class="card-label">El &uacute;ltimo paso</div>
+    <div class="card-title">&#191;Cu&aacute;l es tu compromiso con tu Plan Feminario?</div>
+    <p class="card-body">Siete d&iacute;as, siete ejercicios. Ahora hay un n&uacute;mero concreto, una brecha real y un plan escrito. La pregunta es simple: &#191;qu&eacute; vas a hacer diferente?</p>
+    <textarea style="width:100%;background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.7;resize:vertical;min-height:70px;margin-top:12px;transition:border-color .15s;" id="reflection" placeholder="Ej: 'Voy a configurar mi transferencia autom&aacute;tica antes del viernes...' / 'Me comprometo a invertir X al mes a partir de junio...'" oninput="guardarTexto()"></textarea>
+    <button class="btn-primary" id="save-btn" onclick="guardar()">&#10003; Completar el Reto y ganar mi punto final</button>
+  </div>
+
+  <!-- CELEBRACIÓN -->
+  <div class="celebracion" id="celebracion">
+    <div class="celebracion-emoji">&#127775;&#127881;&#127775;</div>
+    <div class="celebracion-title" id="cel-title">&#161;Lo lograste!</div>
+    <div class="celebracion-sub">7 d&iacute;as. 7 n&uacute;meros. 1 plan. Eso es lo que hiciste esta semana. Comp&aacute;rtelo con la comunidad &mdash; tu historia puede ser el inicio de la de alguien m&aacute;s.</div>
+    <div class="wa-steps">
+      <div>
+        <div class="wa-step-label">Paso 1 &middot; Copia este mensaje</div>
+        <div class="msg-box" id="wa-msg">&#161;Complet&eacute; el Reto Feminversario! &#127775;
+
+7 d&iacute;as. 7 ejercicios. 1 plan financiero que ahora es m&iacute;o.
+
+Conoc&iacute; mi n&uacute;mero de la libertad, el valor de mi hora de vida, mi potencial econ&oacute;mico, mi brecha pensional, hice mi primera inversi&oacute;n y sab&eacute; cu&aacute;nto necesito para mi fondo de autonom&iacute;a.
+
+Ahora s&eacute; a d&oacute;nde voy.
+#RetoFeminversario #PlanFeminario</div>
+        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">&#128203; Copiar mensaje</button>
+      </div>
+      <div>
+        <div class="wa-step-label">Paso 2 &middot; &Aacute;brelo en el grupo</div>
+        <a class="btn-wa-grupo" href="https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN" target="_blank">&#128172; Abrir grupo del reto en WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="day-nav">
+      <span class="nav-label">D&iacute;a 7</span>
+      <div class="dots">
+        <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
+        <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
+        <div class="dot active"></div>
+      </div>
+      <span class="nav-label">7 d&iacute;as</span>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:#c0bbd0;">Feminario &middot; Reto Feminversario &middot; Mayo 2026</p>
+  </div>
+</div>
+
+<!-- PDF HIDDEN LAYER -->
+<div id="pdf-layer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+function fmt(n){if(!n||isNaN(n))return '—';return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
+function fmtC(n){if(!n||isNaN(n))return '—';if(n>=1e9)return '$\u00a0'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return '$\u00a0'+(n/1e6).toFixed(1)+'M';return fmt(n);}
+function fmtP(n){if(!n||isNaN(n))return '—';return Math.round(n)+'%';}
+
+/* ════════════════════════════════════════════
+   PERFILES TAROT
+   Basados en combinación de:
+   - pct_libertad: salario / numero_libertad  (qué tan lejos de su meta)
+   - ya_invierte: femi_d5_tipo === 'ya'
+   - brecha_pct: brecha_pensional / numero_libertad  (gravedad del hueco)
+   - edad: d3_edad o d4_edad
+   ════════════════════════════════════════════ */
+const TAROT = {
+  emperatriz: {
+    arcano: 'El Arcano III',
+    simbolo: '\u2640\ufe0f',
+    nombre: 'La Emperatriz',
+    titulo: 'Construyes con intenci\u00f3n. El poder ya est\u00e1 en tus manos.',
+    descripcion: 'La Emperatriz no espera que las circunstancias mejoren. Ella las cultiva. Tu perfil muestra a alguien que ya empez\u00f3 a mover sus finanzas con direcci\u00f3n: inviertes, tienes claridad sobre tu meta y est\u00e1s construyendo tu red de seguridad. Ahora es el momento de afinar la estrategia y acelerar.',
+    keywords: ['inversora activa','claridad financiera','en construcci\u00f3n'],
+    bg: 'linear-gradient(135deg,#2d1a00,#7a4010,#c07820)',
+    glow: '#f7c175',
+    color: 'white',
+    fortaleza: 'Ya tienes el h\u00e1bito de invertir. Eso es lo m\u00e1s dif\u00edcil y ya lo tienes.',
+    desaf\u00edo: 'Optimizar tu portafolio y asegurarte de que cada peso est\u00e1 trabajando con prop\u00f3sito.',
+    siguiente: 'Revisa tu asignaci\u00f3n de activos con la Regla del 110 y aseg\u00farate de que tu fondo de autonom\u00eda est\u00e9 en una cuenta de alto rendimiento.',
+  },
+  fuerza: {
+    arcano: 'El Arcano VIII',
+    simbolo: '\ud83e\udd81',
+    nombre: 'La Fuerza',
+    titulo: 'Tienes el coraje. Ahora necesitas la t\u00e1ctica.',
+    descripcion: 'La Fuerza no domina al le\u00f3n con violencia, sino con calma y determinaci\u00f3n. Tu perfil muestra a alguien con potencial real y la valent\u00eda de haber tomado acci\u00f3n esta semana. La brecha pensional es significativa, pero tienes los a\u00f1os y la capacidad para cerrarla. Lo que falta no es el \u00e1nimo \u2014 es el plan concreto.',
+    keywords: ['potencial alto','acci\u00f3n tomada','brecha por cerrar'],
+    bg: 'linear-gradient(135deg,#1a0a2e,#4a1060,#9040c0)',
+    glow: '#CEA2DD',
+    color: 'white',
+    fortaleza: 'Ya diste el primer paso con tu inversi\u00f3n. El inicio es el 80% del trabajo.',
+    desaf\u00edo: 'Mantener la constancia. La inversi\u00f3n funciona con el tiempo, no con el monto inicial.',
+    siguiente: 'Configura un aporte mensual autom\u00e1tico aunque sea peque\u00f1o. La constancia vale m\u00e1s que el monto.',
+  },
+  luna: {
+    arcano: 'El Arcano XVIII',
+    simbolo: '\ud83c\udf19',
+    nombre: 'La Luna',
+    titulo: 'El camino est\u00e1 por descubrirse. Y eso es poder.',
+    descripcion: 'La Luna ilumina lo que estaba oculto. Antes de esta semana, muchos de estos n\u00fameros eran sombras. Ahora los tienes frente a ti. Tu perfil indica que hay mucho terreno por construir: el fondo, la inversi\u00f3n, el cierre de la brecha. Pero la mayor\u00eda de las mujeres nunca llegan a ver sus n\u00fameros. T\u00fa ya lo hiciste.',
+    keywords: ['despertar financiero','todo por construir','el momento es ahora'],
+    bg: 'linear-gradient(135deg,#0a1a30,#102040,#2040a0)',
+    glow: '#C2CBFF',
+    color: 'white',
+    fortaleza: 'Tener claridad es el primer y m\u00e1s dif\u00edcil paso. Ya no puedes ignorar lo que sabes.',
+    desaf\u00edo: 'No dejarte paralizar por la magnitud de los n\u00fameros. Un paso a la vez es suficiente.',
+    siguiente: 'Prioriza en este orden: 1) Un mes de fondo de emergencia. 2) Tu primera inversi\u00f3n peque\u00f1a. 3) Repetir.',
+  },
+  rueda: {
+    arcano: 'El Arcano X',
+    simbolo: '\u2609',
+    nombre: 'La Rueda de la Fortuna',
+    titulo: 'El momentum est\u00e1 de tu lado. No lo desperdicies.',
+    descripcion: 'La Rueda no gira sola \u2014 t\u00fa la mueves. Tu perfil muestra un punto de inflexi\u00f3n: tienes a\u00f1os por delante, tu salario y tu meta est\u00e1n relativamente cerca, y cada acci\u00f3n que tomes ahora se multiplica gracias al inter\u00e9s compuesto. El momento \u00f3ptimo para actuar fue hace cinco a\u00f1os. El segundo mejor momento es hoy.',
+    keywords: ['inter\u00e9s compuesto','ventaja del tiempo','punto de inflexi\u00f3n'],
+    bg: 'linear-gradient(135deg,#0d2a10,#1a5020,#40a040)',
+    glow: '#DFF3AF',
+    color: 'white',
+    fortaleza: 'El tiempo es tu activo m\u00e1s valioso. Cada a\u00f1o que inviertes hoy vale el doble que uno que inviertas en 10 a\u00f1os.',
+    desaf\u00edo: 'La tentaci\u00f3n de esperar a tener m\u00e1s antes de empezar. No existe el monto m\u00ednimo ideal.',
+    siguiente: 'Empieza con lo m\u00ednimo posible pero empieza hoy. 10 USD al mes durante 30 a\u00f1os al 8% anual = m\u00e1s de $14M pesos.',
+  }
+};
+
+function calcularPerfil(d){
+  const yaInvierte = d.d5_tipo === 'ya' || d.d5_accion === 'ya';
+  const brecha = Math.max((d.libertad - d.pension), 0);
+  const brechaPct = d.libertad > 0 ? brecha / d.libertad : 1;
+  const pctLibertad = d.libertad > 0 ? d.salario / d.libertad : 0;
+  const fondoPct = d.d6_meta > 0 ? d.d6_ahorro / d.d6_meta : 0;
+  const edad = d.edad || 30;
+
+  // La Emperatriz: ya invierte + brecha manejable (< 60%) + fondo iniciado
+  if(yaInvierte && brechaPct < 0.6 && fondoPct > 0.15) return 'emperatriz';
+
+  // La Rueda: joven (< 35) O salario ya cerca de la libertad (pct > 70%) — el tiempo juega a favor
+  if(edad <= 35 || pctLibertad >= 0.7) return 'rueda';
+
+  // La Fuerza: ya invierte pero brecha grande, o mucho potencial sin fondo
+  if(yaInvierte || (d.d3_potencial > 0 && brechaPct >= 0.6)) return 'fuerza';
+
+  // La Luna: todo por construir
+  return 'luna';
+}
+
+/* ════════════════════════════════════════════
+   DATOS Y CÁLCULOS
+   ════════════════════════════════════════════ */
+function cargarDatos(){
+  const d = {
+    nombre: load('femi_nombre')||'',
+    libertad: parseFloat(load('femi_d1_numero'))||0,
+    salario: parseFloat(load('femi_d2_salario'))||parseFloat(load('femi_d3_salario'))||0,
+    hora: parseFloat(load('femi_d2_hora'))||0,
+    horasMes: parseFloat(load('femi_d2_horas_mes'))||0,
+    potencial: parseFloat(load('femi_d3_potencial'))||0,
+    edad: parseFloat(load('femi_d3_edad'))||parseFloat(load('femi_d4_edad'))||0,
+    retiro: parseFloat(load('femi_d3_retiro'))||62,
+    incremento: parseFloat(load('femi_d3_incremento'))||5,
+    pension: parseFloat(load('femi_d4_pension'))||0,
+    d4_tipo: load('femi_d4_tipo')||'',
+    d5_tipo: load('femi_d5_tipo')||'',
+    d5_accion: load('femi_d5_accion')||'',
+    d6_gastos: parseFloat(load('femi_d6_gastos'))||0,
+    d6_meses: parseInt(load('femi_d6_meses'))||6,
+    d6_meta: parseFloat(load('femi_d6_meta'))||0,
+    d6_ahorro: parseFloat(load('femi_d6_ahorro'))||0,
+    d6_accion: parseInt(load('femi_d6_accion'))||0,
+    d3_potencial: parseFloat(load('femi_d3_potencial'))||0,
+  };
+  // Calcular derivados
+  d.brecha = Math.max(d.libertad - d.pension, 0);
+  d.pctLibertad = d.salario > 0 && d.libertad > 0 ? Math.round(d.salario/d.libertad*100) : 0;
+  d.horasLibertad = d.hora > 0 && d.libertad > 0 ? Math.round(d.libertad/d.hora) : 0;
+  d.faltaFondo = Math.max(d.d6_meta - d.d6_ahorro, 0);
+  // Aporte mensual inversión (escenario retiro legal 62)
+  const anios = Math.max(62 - d.edad, 1);
+  const meses = anios * 12;
+  const r = 0.06/12;
+  const cap = d.brecha * 240;
+  d.aporteInv = (d.brecha > 0 && meses > 0) ? Math.ceil(cap * r / (Math.pow(1+r,meses)-1) / 1000)*1000 : 0;
+  // Aporte escenario soñado
+  const aniosSon = Math.max(d.retiro - d.edad, 1);
+  const mesesSon = aniosSon * 12;
+  d.aporteInvSon = (d.brecha > 0 && mesesSon > 0) ? Math.ceil(cap * r / (Math.pow(1+r,mesesSon)-1) / 1000)*1000 : 0;
+  return d;
+}
+
+/* ════════════════════════════════════════════
+   RENDER TAROT
+   ════════════════════════════════════════════ */
+function renderTarot(d){
+  const perfil = calcularPerfil(d);
+  const t = TAROT[perfil];
+  save('femi_d7_perfil', perfil);
+  const html = `
+    <div class="tarot-card" style="background:${t.bg};color:${t.color};margin-bottom:14px;">
+      <div class="tarot-glow" style="background:${t.glow};"></div>
+      <div class="tarot-arcano" style="color:${t.color};">${t.arcano} &middot; Tu perfil Feminario</div>
+      <div class="tarot-simbolo">${t.simbolo}</div>
+      <div class="tarot-nombre">${t.nombre}</div>
+      <div class="tarot-titulo">${t.titulo}</div>
+      <div class="tarot-descripcion">${t.descripcion}</div>
+      <div class="tarot-keywords">${t.keywords.map(k=>`<span class="tarot-kw">${k}</span>`).join('')}</div>
+    </div>`;
+  document.getElementById('tarot-section').innerHTML = html;
+  return {perfil, t};
+}
+
+/* ════════════════════════════════════════════
+   RENDER PLAN
+   ════════════════════════════════════════════ */
+const ACCIONES_D6 = [null,
+  'Abrir una cuenta separada para el fondo',
+  'Configurar una transferencia autom\u00e1tica mensual',
+  'Hacer tu primer dep\u00f3sito al fondo',
+  'Calcular d\u00f3nde recortas para ahorrar',
+  'Investigar una cuenta de alto rendimiento o fiducuenta',
+];
+
+function renderPlan(d, t_data){
+  const {t} = t_data;
+  const bloques = [];
+
+  if(d.libertad) bloques.push({icon:'\u2728', label:'Tu n\u00famero de la libertad', valor:fmt(d.libertad)+' /mes', sub: d.pctLibertad > 0 ? 'Tu salario es el '+d.pctLibertad+'% de tu meta' : '', accion: d.pctLibertad >= 100 ? 'Tu salario ya cubre tu n\u00famero. El reto ahora es protegerlo y multiplicarlo.' : 'La brecha entre lo que ganas y lo que quieres vivir se cierra con inversi\u00f3n, no con esperar el bono.'});
+
+  if(d.salario) bloques.push({icon:'\u23f0', label:'El precio real de tu hora', valor:fmt(d.hora)+' /hora', sub: d.horasMes > 0 ? d.horasMes+' horas al mes \u00d7 '+fmt(d.hora) : '', accion: d.horasLibertad > 0 ? 'Necesitas '+d.horasLibertad+' horas al mes trabajadas para cubrir tu libertad. Cada gasto que reduces, recuperas tiempo real de vida.' : ''});
+
+  if(d.potencial) bloques.push({icon:'\ud83d\udcc8', label:'Tu potencial econ\u00f3mico de vida', valor:fmtC(d.potencial), sub:'Lo que generar\u00e1s durante tu vida laboral', accion:'Este es el capital que pasa por tus manos. La pregunta no es cu\u00e1nto ganas \u2014 es cu\u00e1nto te quedas.'});
+
+  if(d.pension !== undefined && d.libertad) bloques.push({icon:'\ud83d\udfe5', label:'Tu brecha pensional mensual', valor:d.brecha > 0 ? fmt(d.brecha)+' /mes' : '\u2705 Sin brecha', sub: d.pension > 0 ? 'Pensi\u00f3n estimada: '+fmt(d.pension)+'/mes' : '', accion: d.brecha > 0 ? 'Para cerrar esta brecha, necesitas invertir '+fmt(d.aporteInv)+' al mes durante '+(Math.max(62-d.edad,1))+' a\u00f1os (al 6% anual).' : 'Tu pensi\u00f3n estimada cubre tu meta. Invertir igual te da margen y libertad adicional.'});
+
+  const invDesc = d.d5_tipo === 'ya' ? 'Ya ten\u00edas cuenta de inversiones' : 'Abriste tu primera cuenta esta semana';
+  bloques.push({icon:'\ud83c\udf31', label:'Tu primera inversi\u00f3n', valor: d.d5_tipo === 'ya' ? 'Inversora activa \u2705' : 'Reci\u00e9n empezaste \u2728', sub: invDesc, accion: 'La inversi\u00f3n m\u00e1s importante no es la de mayor monto. Es la que haces todos los meses sin falta.'});
+
+  if(d.d6_meta) bloques.push({icon:'\ud83d\udee1\ufe0f', label:'Tu fondo para la autonom\u00eda', valor:fmt(d.d6_meta), sub: d.d6_meses+' meses de gastos reales', accion: d.faltaFondo > 0 ? 'Te faltan '+fmt(d.faltaFondo)+'. '+((ACCIONES_D6[d.d6_accion])||'Sigue construy\u00e9ndolo.')  : '\u00a1Fondo completo! Prot\u00e9gelo en cuenta de alto rendimiento o fiducuenta.'});
+
+  const html = bloques.map(b => `
+    <div class="plan-bloque">
+      <div class="plan-bloque-header">
+        <span class="plan-icono">${b.icon}</span>
+        <div>
+          <div class="plan-etiqueta">${b.label}</div>
+          <div class="plan-valor">${b.valor}</div>
+          ${b.sub ? `<div class="plan-sub">${b.sub}</div>` : ''}
+        </div>
+      </div>
+      ${b.accion ? `<div class="plan-accion">${b.accion}</div>` : ''}
+    </div>`).join('');
+  document.getElementById('plan-bloques').innerHTML = html;
+  document.getElementById('plan-titulo').textContent = 'Tu Plan Feminario' + (d.nombre ? ', '+d.nombre : '');
+}
+
+/* ════════════════════════════════════════════
+   RENDER HORIZONTES
+   ════════════════════════════════════════════ */
+function renderHorizontes(d, t_data){
+  const {t} = t_data;
+  const mesItems = [];
+  const anioItems = [];
+  const quintoItems = [];
+
+  // Este mes
+  if(d.d6_meta && d.faltaFondo > 0) mesItems.push('Destinar '+fmt(Math.ceil(d.faltaFondo/18/10000)*10000)+' al mes a tu fondo de autonom\u00eda (en 18 meses lo tienes completo)');
+  if(d.d5_tipo === 'nueva') mesItems.push('Explorar en XTB los ETFs recomendados para tu perfil y hacer tu primera compra, aunque sea de 1 participaci\u00f3n');
+  mesItems.push(t.siguiente);
+  if(d.brecha > 0 && d.aporteInv > 0) mesItems.push('Configurar un aporte mensual autom\u00e1tico de inversi\u00f3n de al menos '+fmt(Math.min(d.aporteInv, d.salario*0.1)));
+
+  // Este año
+  if(d.d6_meta && d.faltaFondo > 0) anioItems.push('Llegar al 50% de tu fondo de autonom\u00eda ('+fmt(d.d6_meta*0.5)+')');
+  anioItems.push('Revisar y ajustar tu portafolio de inversi\u00f3n cada trimestre');
+  if(d.d4_tipo) anioItems.push('Consultar con '+( d.d4_tipo === 'colpensiones' ? 'Colpensiones' : 'tu fondo privado')+' tu historia laboral y estado de semanas cotizadas');
+  anioItems.push('Aumentar tu aporte de inversi\u00f3n al menos una vez durante el a\u00f1o');
+
+  // En 5 años
+  if(d.d6_meta) quintoItems.push('Tener tu fondo de autonom\u00eda al 100%: '+fmt(d.d6_meta));
+  if(d.brecha > 0) quintoItems.push('Haber invertido '+fmt(d.aporteInv)+'/mes durante 5 a\u00f1os — acumulado: '+fmtC(d.aporteInv*60));
+  quintoItems.push('Revisar tu n\u00famero de la libertad y ajustar tu estrategia a la vida que est\u00e1s viviendo');
+  quintoItems.push('Haber hablado de dinero con al menos 3 mujeres en tu vida');
+
+  const html = `
+    <div class="horizonte" style="background:linear-gradient(135deg,var(--crema),var(--lila-l));border:1.5px solid var(--lila);">
+      <div class="horizonte-label" style="color:#7a40a0;">&#127987;&#65039; Este mes</div>
+      <div class="horizonte-titulo" style="color:var(--texto);">Empieza con lo concreto</div>
+      <div class="horizonte-items">${mesItems.map(i=>`<div class="horizonte-item" style="color:var(--muted);">${i}</div>`).join('')}</div>
+    </div>
+    <div class="horizonte" style="background:linear-gradient(135deg,var(--crema),#fff8e8);border:1.5px solid var(--dorado);">
+      <div class="horizonte-label" style="color:#9a6b10;">&#128197; Este a&ntilde;o</div>
+      <div class="horizonte-titulo" style="color:var(--texto);">Construye el h&aacute;bito</div>
+      <div class="horizonte-items">${anioItems.map(i=>`<div class="horizonte-item" style="color:var(--muted);">${i}</div>`).join('')}</div>
+    </div>
+    <div class="horizonte" style="background:linear-gradient(135deg,var(--verde-l),rgba(223,243,175,.3));border:1.5px solid rgba(74,158,110,.4);">
+      <div class="horizonte-label" style="color:#2d6a4f;">&#127775; En 5 a&ntilde;os</div>
+      <div class="horizonte-titulo" style="color:var(--texto);">La versi&oacute;n de ti que ya est&aacute;s construyendo</div>
+      <div class="horizonte-items">${quintoItems.map(i=>`<div class="horizonte-item" style="color:var(--muted);">${i}</div>`).join('')}</div>
+    </div>`;
+  document.getElementById('horizontes').innerHTML = html;
+}
+
+/* ════════════════════════════════════════════
+   GENERAR PDF con jsPDF
+   ════════════════════════════════════════════ */
+async function generarPDF(){
+  const btn = document.getElementById('btn-pdf');
+  btn.classList.add('generating');
+  btn.textContent = 'Generando tu plan...';
+
+  const d = cargarDatos();
+  const perfil = calcularPerfil(d);
+  const t = TAROT[perfil];
+
+  // Color primario del perfil para el PDF
+  const COLORES = {
+    emperatriz: {r:120,g:64,b:16},
+    fuerza: {r:74,g:16,b:96},
+    luna: {r:16,g:32,b:160},
+    rueda: {r:32,g:80,b:32},
+  };
+  const col = COLORES[perfil];
+
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+  const W = 210, margin = 18;
+  let y = 0;
+
+  // ── helpers ──
+  const setColor = (r,g,b) => { doc.setTextColor(r,g,b); };
+  const setFill  = (r,g,b) => { doc.setFillColor(r,g,b); };
+  const linea = (extra=6) => { y += extra; };
+  const checkPage = (needed=20) => { if(y + needed > 272){ doc.addPage(); y = 18; } };
+
+  const titulo = (txt, sz=13, r=43,g=32,b=64) => {
+    checkPage(sz+6);
+    setColor(r,g,b);
+    doc.setFontSize(sz); doc.setFont('helvetica','bold');
+    doc.text(txt, margin, y); y += sz*0.45+4;
+  };
+  const cuerpo = (txt, sz=10, r=107,g=96,b=128) => {
+    checkPage(sz+4);
+    setColor(r,g,b);
+    doc.setFontSize(sz); doc.setFont('helvetica','normal');
+    const lines = doc.splitTextToSize(txt, W-margin*2);
+    doc.text(lines, margin, y); y += lines.length*(sz*0.45)+3;
+  };
+  const etiqueta = (txt) => {
+    checkPage(8);
+    setColor(col.r,col.g,col.b);
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text(txt.toUpperCase(), margin, y); y += 5;
+  };
+  const hr = (light=false) => {
+    checkPage(6);
+    doc.setDrawColor(light?220:180, light?210:170, light?240:200);
+    doc.line(margin, y, W-margin, y); y += 5;
+  };
+
+  // ══ PORTADA ══
+  setFill(col.r,col.g,col.b);
+  doc.rect(0,0,W,60,'F');
+  // feminario
+  setColor(255,255,255);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('feminario  ·  Reto Feminversario  ·  Mayo 2026', margin, 14);
+  // nombre
+  doc.setFontSize(22); doc.setFont('helvetica','bold');
+  doc.text('Tu Plan Feminario', margin, 30);
+  if(d.nombre){
+    doc.setFontSize(13); doc.setFont('helvetica','normal');
+    doc.text(d.nombre, margin, 40);
+  }
+  doc.setFontSize(9);
+  doc.text(new Date().toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'}), margin, 50);
+  y = 70;
+
+  // ══ PERFIL TAROT ══
+  setFill(col.r,col.g,col.b);
+  doc.roundedRect(margin, y, W-margin*2, 42, 4, 4, 'F');
+  setColor(255,255,255);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.text(t.arcano+' · Tu perfil Feminario', margin+6, y+10);
+  doc.setFontSize(16); doc.setFont('helvetica','bold');
+  doc.text(t.nombre, margin+6, y+20);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  const descLines = doc.splitTextToSize(t.titulo, W-margin*2-12);
+  doc.text(descLines, margin+6, y+28);
+  y += 50; linea(2);
+
+  // ══ RADIOGRAFÍA ══
+  titulo('Tu radiograf\u00eda financiera', 13, col.r, col.g, col.b);
+  linea(2);
+
+  const bloques = [
+    d.libertad && ['Tu n\u00famero de la libertad', fmt(d.libertad)+' al mes', d.pctLibertad > 0 ? 'Tu salario cubre el '+d.pctLibertad+'% de tu meta' : ''],
+    d.hora && ['El precio real de tu hora', fmt(d.hora)+' por hora', d.horasLibertad > 0 ? 'Necesitas '+d.horasLibertad+' horas trabajadas para cubrir tu libertad' : ''],
+    d.potencial && ['Tu potencial econ\u00f3mico de vida', fmtC(d.potencial), 'Lo que generar\u00e1s en tu vida laboral'],
+    d.libertad && ['Tu brecha pensional mensual', d.brecha > 0 ? fmt(d.brecha)+' al mes' : 'Sin brecha', d.pension ? 'Pensi\u00f3n estimada: '+fmt(d.pension)+'/mes' : ''],
+    ['Tu primera inversi\u00f3n', d.d5_tipo === 'ya' ? 'Inversora activa' : 'Primera cuenta abierta', 'Tomaste acci\u00f3n esta semana'],
+    d.d6_meta && ['Tu fondo para la autonom\u00eda', fmt(d.d6_meta), d.d6_meses+' meses de gastos reales \u2022 '+(d.faltaFondo > 0 ? fmt(d.faltaFondo)+' por construir' : 'Completo!')],
+  ].filter(Boolean);
+
+  bloques.forEach(([etiq, val, sub]) => {
+    checkPage(24);
+    setFill(252,248,255);
+    doc.roundedRect(margin, y, W-margin*2, 18, 2, 2, 'F');
+    setColor(col.r,col.g,col.b);
+    doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+    doc.text(etiq.toUpperCase(), margin+4, y+6);
+    setColor(43,32,64);
+    doc.setFontSize(11); doc.setFont('helvetica','bold');
+    doc.text(val, margin+4, y+13);
+    if(sub){
+      setColor(107,96,128);
+      doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.text(sub, W-margin-4, y+13, {align:'right'});
+    }
+    y += 22;
+  });
+
+  linea(4); hr();
+
+  // ══ HOJA DE RUTA ══
+  titulo('Tu hoja de ruta', 13, col.r, col.g, col.b); linea(2);
+
+  const horizontesPDF = [
+    {label:'ESTE MES', color:[col.r,col.g,col.b], items:[
+      d.d6_meta && d.faltaFondo > 0 ? 'Ahorrar '+fmt(Math.ceil(d.faltaFondo/18/10000)*10000)+'/mes para el fondo (meta: 18 meses)' : null,
+      d.d5_tipo === 'nueva' ? 'Explorar en XTB los ETFs recomendados y hacer tu primera compra' : null,
+      t.siguiente,
+      d.brecha > 0 && d.aporteInv > 0 ? 'Configurar aporte mensual de inversi\u00f3n: '+fmt(Math.min(d.aporteInv, d.salario*0.1))+' m\u00ednimo' : null,
+    ].filter(Boolean)},
+    {label:'ESTE A\u00d1O', color:[col.r,col.g,col.b], items:[
+      d.d6_meta && d.faltaFondo > 0 ? 'Llegar al 50% del fondo de autonom\u00eda ('+fmt(d.d6_meta*0.5)+')' : null,
+      'Revisar y ajustar tu portafolio cada trimestre',
+      'Aumentar tu aporte de inversi\u00f3n al menos una vez',
+      'Revisar tu historia laboral en '+( d.d4_tipo === 'colpensiones' ? 'Colpensiones' : 'tu fondo de pensi\u00f3n'),
+    ].filter(Boolean)},
+    {label:'EN 5 A\u00d1OS', color:[col.r,col.g,col.b], items:[
+      d.d6_meta ? 'Fondo de autonom\u00eda completo: '+fmt(d.d6_meta) : null,
+      d.brecha > 0 ? 'Haber invertido '+fmt(d.aporteInv)+'/mes \u00d7 60 meses = '+fmtC(d.aporteInv*60)+' acumulado' : null,
+      'Revisar tu n\u00famero de la libertad y ajustar a tu nueva vida',
+      'Haber hablado de dinero con al menos 3 mujeres en tu vida',
+    ].filter(Boolean)},
+  ];
+
+  horizontesPDF.forEach(h => {
+    checkPage(30);
+    setColor(...h.color);
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text(h.label, margin, y); y += 5;
+    h.items.forEach(item => {
+      checkPage(8);
+      setColor(43,32,64);
+      doc.setFontSize(9); doc.setFont('helvetica','normal');
+      const lines = doc.splitTextToSize('\u2192  '+item, W-margin*2-6);
+      doc.text(lines, margin+3, y);
+      y += lines.length*5+2;
+    });
+    linea(4); hr(true);
+  });
+
+  // ══ FORTALEZA Y DESAFÍO ══
+  checkPage(40);
+  titulo('Tu fortaleza y tu siguiente reto', 12, col.r, col.g, col.b); linea(2);
+  etiqueta('Fortaleza'); cuerpo(t.fortaleza); linea(2);
+  etiqueta('Desaf\u00edo'); cuerpo(t.desafio||t['desaf\u00edo']||''); linea(2);
+
+  // ══ PIE ══
+  checkPage(16);
+  hr();
+  setColor(107,96,128);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.text('Este plan es tuyo. Generado el '+new Date().toLocaleDateString('es-CO')+' con Feminario \u00b7 feminario.co', margin, y);
+  y += 6;
+  doc.text('Los n\u00fameros son proyecciones educativas, no asesor\u00eda financiera personalizada.', margin, y);
+
+  doc.save('Plan-Feminario-'+(d.nombre||'mi-plan')+'.pdf');
+  btn.classList.remove('generating');
+  btn.innerHTML = '<span style="font-size:20px;">\u2705</span> Plan descargado \u2014 \u00a1es tuyo!';
+}
+
+/* ════════════════════════════════════════════
+   PROGRESO + GUARDAR
+   ════════════════════════════════════════════ */
+function actualizarProgreso(){
+  const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
+  const pts=dias.filter(d=>load(d)==='1').length;
+  document.getElementById('progress-fill').style.width=(pts/7*100)+'%';
+  document.getElementById('progress-pts').textContent=pts+'/7 \u2b50';
+  dias.forEach((d,i)=>{
+    const c=document.getElementById('chip'+(i+1));if(!c)return;
+    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='\u2713';}
+    else if(i===6&&load(d)!=='1'){c.classList.add('active');}
+  });
+}
+
+function guardarTexto(){save('femi_d7_reflexion',document.getElementById('reflection').value);}
+
+function copiarMensaje(){
+  const txt=document.getElementById('wa-msg').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{document.getElementById('copy-btn').textContent='\u2705 \u00a1Copiado!';})
+  .catch(()=>{const r=document.createRange();r.selectNode(document.getElementById('wa-msg'));window.getSelection().removeAllRanges();window.getSelection().addRange(r);document.execCommand('copy');document.getElementById('copy-btn').textContent='\u2705 \u00a1Copiado!';});
+}
+
+function guardar(){
+  const btn=document.getElementById('save-btn');
+  save('femi_d7_listo','1');
+  save('femi_d7_reflexion_texto',document.getElementById('reflection').value);
+  btn.textContent='\u2713 \u00a1Reto completado! 7/7 \u2b50';
+  btn.classList.add('saved');
+  actualizarProgreso();
+  const nombre=load('femi_nombre')||'';
+  document.getElementById('cel-title').textContent='\u00a1Lo lograste'+(nombre?', '+nombre:'')+'!';
+  document.getElementById('celebracion').classList.add('visible');
+  document.getElementById('celebracion').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════ */
+window.addEventListener('load',()=>{
+  actualizarProgreso();
+  const d = cargarDatos();
+  const t_data = renderTarot(d);
+  renderPlan(d, t_data);
+  renderHorizontes(d, t_data);
+
+  const r=load('femi_d7_reflexion');
+  if(r) document.getElementById('reflection').value=r;
+
+  if(load('femi_d7_listo')==='1'){
+    const btn=document.getElementById('save-btn');
+    btn.textContent='\u2713 \u00a1Reto completado! 7/7 \u2b50';btn.classList.add('saved');
+    const nombre=load('femi_nombre')||'';
+    document.getElementById('cel-title').textContent='\u00a1Lo lograste'+(nombre?', '+nombre:'')+'!';
+    document.getElementById('celebracion').classList.add('visible');
+  }
+});
+</script>
+</body>
+</html>
