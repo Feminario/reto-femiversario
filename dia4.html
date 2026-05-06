@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --azul:#7E84AE;--azul-l:#C2CBFF;--lila:#CEA2DD;--menta:#DFF3AF;
+  --naranja:#F59356;--crema:#FFEAD2;--crema-l:#FFF7EF;
+  --lila-l:#F9E1FF;--dorado:#F7C175;--rojo:#E05050;--rojo-l:#FFF0F0;
+  --texto:#2B2040;--muted:#6B6080;--border:rgba(126,132,174,0.2);
+}
+body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-serif;min-height:100vh;padding-bottom:48px;}
+
+.progress-bar-wrap{position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(126,132,174,.08);}
+.progress-label{font-size:11px;font-weight:700;color:var(--azul);white-space:nowrap;}
+.progress-track{flex:1;height:8px;background:var(--crema);border-radius:8px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--azul) 0%,var(--lila) 100%);transition:width .6s cubic-bezier(.4,0,.2,1);}
+.progress-pts{font-size:12px;font-weight:700;color:var(--azul);white-space:nowrap;min-width:36px;text-align:right;}
+
+.day-chips{display:flex;gap:4px;padding:0 16px 8px;background:white;justify-content:center;border-bottom:1px solid var(--border);}
+.chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .3s;}
+.chip.done{background:var(--azul);border-color:var(--azul);color:white;}
+.chip.active{border-color:var(--naranja);color:var(--naranja);}
+
+.header{background:linear-gradient(135deg,#3a2a5a 0%,#5a3080 60%,var(--azul) 100%);padding:20px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:var(--crema-l);border-radius:20px 20px 0 0;}
+.logo-text{font-size:20px;font-weight:700;color:white;letter-spacing:.04em;}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.65);letter-spacing:.05em;margin-top:2px;margin-bottom:14px;}
+.header-pill{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:10px;color:white;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.header-title{font-size:clamp(20px,5vw,30px);font-weight:700;color:white;line-height:1.2;margin-bottom:6px;}
+.header-title em{font-style:italic;font-weight:400;color:var(--dorado);}
+.header-sub-text{font-size:12px;color:rgba(255,255,255,.8);}
+
+.content{max-width:600px;margin:0 auto;padding:20px 16px 0;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(126,132,174,.06);}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul);margin-bottom:6px;}
+.card-title{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:10px;line-height:1.3;}
+.card-body{font-size:13px;color:var(--muted);line-height:1.8;}
+.card-body strong{color:var(--texto);font-weight:600;}
+.callout{background:var(--lila-l);border-left:3px solid var(--lila);border-radius:0 10px 10px 0;padding:14px 16px;margin-top:14px;font-size:13px;color:var(--texto);line-height:1.7;font-weight:500;}
+
+/* SELECTOR FONDO */
+.fondo-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.fondo-btn{border:2px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--crema-l);}
+.fondo-btn:hover{border-color:var(--azul);}
+.fondo-btn.selected{border-color:var(--azul);background:rgba(126,132,174,.08);}
+.fondo-icon{font-size:24px;margin-bottom:6px;}
+.fondo-name{font-size:12px;font-weight:700;color:var(--texto);}
+.fondo-desc{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+/* GUIA CONSULTA */
+.guia-box{background:var(--crema);border:1px solid var(--dorado);border-radius:12px;padding:14px 16px;margin-top:14px;display:none;}
+.guia-box.visible{display:block;}
+.guia-title{font-size:11px;font-weight:700;color:#7a5000;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.guia-steps{display:flex;flex-direction:column;gap:6px;}
+.guia-step{font-size:12px;color:#5a3800;line-height:1.5;padding-left:4px;}
+.guia-step span{font-weight:700;}
+.guia-link{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;color:var(--azul);text-decoration:none;}
+.guia-link:hover{text-decoration:underline;}
+
+/* INPUTS */
+.input-section{display:none;margin-top:14px;}
+.input-section.visible{display:block;}
+.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.input-label{font-size:11px;color:var(--muted);font-weight:600;}
+.input-hint{font-size:10px;color:#c0bbd0;margin-top:2px;}
+.calc-input{background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;width:100%;transition:border-color .15s;-moz-appearance:textfield;}
+.calc-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.calc-input:focus{outline:none;border-color:var(--azul);background:white;}
+.calc-input::placeholder{color:#c0bbd0;font-weight:400;}
+
+/* BARRA DE BRECHA */
+.brecha-card{display:none;margin-top:14px;}
+.brecha-card.visible{display:block;animation:pop .5s cubic-bezier(.4,0,.2,1);}
+@keyframes pop{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+.brecha-header{background:linear-gradient(135deg,#3a2a5a,#5a3080);border-radius:14px 14px 0 0;padding:18px;color:white;text-align:center;}
+.brecha-titulo{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:6px;}
+.brecha-num{font-size:38px;font-weight:700;color:var(--dorado);line-height:1;}
+.brecha-sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px;}
+
+.brecha-body{background:white;border:1px solid var(--border);border-radius:0 0 14px 14px;padding:16px;}
+
+.bar-row{margin-bottom:14px;}
+.bar-labels{display:flex;justify-content:space-between;margin-bottom:5px;}
+.bar-label{font-size:11px;color:var(--muted);font-weight:500;}
+.bar-val{font-size:11px;font-weight:700;}
+.bar-track{height:10px;background:var(--crema);border-radius:10px;overflow:hidden;margin-bottom:2px;}
+.bar-fill{height:100%;border-radius:10px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.bar-fill.pension{background:linear-gradient(90deg,#E05050,#c03030);}
+.bar-fill.libertad{background:linear-gradient(90deg,var(--azul),var(--lila));}
+
+.gap-alerta{background:var(--rojo-l);border:1.5px solid var(--rojo);border-radius:12px;padding:14px 16px;margin-top:4px;}
+.gap-titulo{font-size:12px;font-weight:700;color:var(--rojo);margin-bottom:4px;}
+.gap-num{font-size:22px;font-weight:700;color:var(--rojo);margin-bottom:4px;}
+.gap-desc{font-size:11px;color:#8a3030;line-height:1.6;}
+
+.contexto-femenino{background:var(--lila-l);border-left:3px solid var(--lila);border-radius:0 10px 10px 0;padding:14px 16px;margin-top:12px;}
+.contexto-femenino p{font-size:12px;color:var(--muted);line-height:1.7;}
+.contexto-femenino strong{color:var(--texto);}
+
+/* REFLECTION */
+.reflection-area{width:100%;background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.7;resize:vertical;min-height:80px;margin-top:12px;transition:border-color .15s;}
+.reflection-area:focus{outline:none;border-color:var(--azul);background:white;}
+.reflection-area::placeholder{color:#c0bbd0;}
+
+.btn-primary{display:block;width:100%;margin-top:12px;padding:14px;background:var(--naranja);border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;}
+.btn-primary:hover{background:#e07d3d;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary.saved{background:#4a9e6e;}
+
+.celebracion{display:none;margin-top:14px;background:linear-gradient(135deg,var(--menta) 0%,var(--crema) 100%);border:2px solid #7abf45;border-radius:16px;padding:20px;}
+.celebracion.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
+.celebracion-emoji{font-size:36px;margin-bottom:8px;text-align:center;}
+.celebracion-title{font-size:16px;font-weight:700;color:#2d5a1a;margin-bottom:6px;text-align:center;}
+.celebracion-sub{font-size:12px;color:#4a7a2a;line-height:1.7;margin-bottom:16px;text-align:center;}
+.wa-steps{display:flex;flex-direction:column;gap:10px;}
+.wa-step-label{font-size:10px;font-weight:700;color:#4a7a2a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.msg-box{background:white;border:1px solid #7abf45;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--texto);line-height:1.7;white-space:pre-line;}
+.btn-copy{display:block;width:100%;margin-top:8px;padding:10px;background:white;border:2px solid #7abf45;border-radius:10px;color:#2d5a1a;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-copy:hover{background:var(--menta);}
+.btn-wa-grupo{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#25D366;border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;}
+.btn-wa-grupo:hover{background:#1db954;}
+
+.card-menta{background:white;border:1.5px solid var(--menta);border-radius:16px;padding:18px 20px;margin-bottom:14px;}
+.menta-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4a7a2a;margin-bottom:6px;}
+.footer{text-align:center;padding:16px 0 0;border-top:1px solid var(--border);margin-top:6px;}
+.day-nav{display:flex;justify-content:space-between;align-items:center;}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);}
+.dot.done{background:var(--azul);}
+.dot.active{background:var(--azul);width:20px;border-radius:3px;}
+.nav-label{font-size:11px;color:var(--muted);font-weight:500;}
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap">
+  <span class="progress-label">Tu progreso</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <span class="progress-pts" id="progress-pts">0/7 ⭐</span>
+</div>
+<div class="day-chips">
+  <div class="chip" id="chip1">1</div><div class="chip" id="chip2">2</div>
+  <div class="chip" id="chip3">3</div><div class="chip active" id="chip4">4</div>
+  <div class="chip" id="chip5">5</div><div class="chip" id="chip6">6</div>
+  <div class="chip" id="chip7">7</div>
+</div>
+
+<div class="header">
+  <div class="logo-text">feminario</div>
+  <div class="logo-sub">el espacio seguro donde las mujeres redefinimos la autonomía económica</div>
+  <div class="header-pill">Reto Feminversario · Día 4 de 7 · 13 de mayo</div>
+  <h1 class="header-title">El hueco de tu <em>pensión</em></h1>
+  <p class="header-sub-text">El número que el sistema nunca te mostró. Hasta hoy.</p>
+</div>
+
+<div class="content">
+
+  <div class="card">
+    <div class="card-label">El día más importante del reto</div>
+    <div class="card-title">Hay una brecha entre lo que recibirías y lo que necesitas. Hoy la mides.</div>
+    <p class="card-body">
+      Solo 1 de cada 8 mujeres en Colombia se pensiona. Y las que lo logran descubren que la pensión que reciben no alcanza para vivir como querían.<br><br>
+      No es mala suerte. Es el resultado acumulado de salarios más bajos, trabajos informales, pausas en la vida laboral para cuidar a otros — y un sistema que no fue diseñado pensando en nosotras.<br><br>
+      <strong>Hoy ese problema deja de ser una estadística y se convierte en tu número.</strong>
+    </p>
+    <div class="callout">
+      Este ejercicio no es para asustarte. Es para que dejes de ignorar algo que ya existe — y puedas actuar a tiempo.
+    </div>
+  </div>
+
+  <!-- PASO 1: TIPO DE FONDO -->
+  <div class="card">
+    <div class="card-label">Paso 1 · ¿En qué fondo estás?</div>
+    <div class="card-title">Selecciona tu régimen pensional</div>
+    <p class="card-body">En Colombia existen dos sistemas. Selecciona el tuyo para ver cómo consultar tu información.</p>
+
+    <div class="fondo-selector">
+      <div class="fondo-btn" id="btn-colpensiones" onclick="seleccionarFondo('colpensiones')">
+        <div class="fondo-icon">🏛️</div>
+        <div class="fondo-name">Colpensiones</div>
+        <div class="fondo-desc">Régimen de Prima Media (público)</div>
+      </div>
+      <div class="fondo-btn" id="btn-privado" onclick="seleccionarFondo('privado')">
+        <div class="fondo-icon">🏦</div>
+        <div class="fondo-name">Fondo privado</div>
+        <div class="fondo-desc">Porvenir, Protección, Colfondos, Old Mutual</div>
+      </div>
+    </div>
+
+    <!-- GUÍA COLPENSIONES -->
+    <div class="guia-box" id="guia-colpensiones">
+      <div class="guia-title">📋 Cómo consultar tu estado en Colpensiones</div>
+      <div class="guia-steps">
+        <div class="guia-step">1. Entra a <span>colpensiones.gov.co</span> o descarga la app <span>"Mi Colpensiones"</span></div>
+        <div class="guia-step">2. Inicia sesión con tu cédula y contraseña</div>
+        <div class="guia-step">3. Ve a <span>"Mi historia laboral"</span> → busca el total de <span>semanas cotizadas</span></div>
+        <div class="guia-step">4. Para pensionarte necesitas mínimo <span>1.300 semanas</span> (≈ 25 años)</div>
+        <div class="guia-step">5. La pensión mínima actual es <span>~$1.423.000/mes</span> (1 SMMLV 2026)</div>
+      </div>
+      <a href="https://www.colpensiones.gov.co" target="_blank" class="guia-link">→ Ir a Colpensiones.gov.co</a>
+    </div>
+
+    <!-- GUÍA PRIVADO -->
+    <div class="guia-box" id="guia-privado">
+      <div class="guia-title">📋 Cómo consultar tu saldo en fondo privado</div>
+      <div class="guia-steps">
+        <div class="guia-step">1. Entra a la app o portal web de tu fondo (<span>Porvenir, Protección, Colfondos</span>)</div>
+        <div class="guia-step">2. Busca <span>"Mi cuenta individual"</span> o <span>"Saldo disponible"</span></div>
+        <div class="guia-step">3. Anota tu <span>saldo de ahorro pensional</span> (no el de cesantías)</div>
+        <div class="guia-step">4. La pensión estimada = saldo ÷ meses de vida esperados después del retiro</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2: INGRESAR DATOS -->
+  <div class="card" id="datos-card" style="display:none;">
+    <div class="card-label">Paso 2 · Tus datos pensionales</div>
+    <div class="card-title" id="datos-titulo">Ingresa la información de tu pensión</div>
+
+    <!-- COLPENSIONES -->
+    <div class="input-section" id="input-colpensiones">
+      <div class="input-group">
+        <label class="input-label">📅 Semanas cotizadas hasta hoy</label>
+        <input class="calc-input" type="number" id="semanas" placeholder="ej. 520" oninput="calcularBrecha()">
+        <span class="input-hint">Lo encuentras en "Mi historia laboral" en la app de Colpensiones</span>
+      </div>
+      <div class="input-group">
+        <label class="input-label">🎂 Tu edad actual</label>
+        <input class="calc-input" type="number" id="edad-col" placeholder="ej. 32" oninput="calcularBrecha()">
+      </div>
+      <div class="input-group">
+        <label class="input-label">💰 Tu salario mensual actual</label>
+        <input class="calc-input" type="number" id="sal-col" placeholder="$ 0" oninput="calcularBrecha()">
+        <span class="input-hint" id="sal-col-hint"></span>
+      </div>
+    </div>
+
+    <!-- PRIVADO -->
+    <div class="input-section" id="input-privado">
+      <div class="input-group">
+        <label class="input-label">💰 Tu saldo pensional actual</label>
+        <input class="calc-input" type="number" id="saldo" placeholder="$ 0" oninput="calcularBrecha()">
+        <span class="input-hint">El saldo de ahorro pensional (no cesantías)</span>
+      </div>
+      <div class="input-group">
+        <label class="input-label">🎂 Tu edad actual</label>
+        <input class="calc-input" type="number" id="edad-priv" placeholder="ej. 32" oninput="calcularBrecha()">
+      </div>
+      <div class="input-group">
+        <label class="input-label">💵 Tu salario mensual actual</label>
+        <input class="calc-input" type="number" id="sal-priv" placeholder="$ 0" oninput="calcularBrecha()">
+        <span class="input-hint" id="sal-priv-hint"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO: BRECHA -->
+  <div class="brecha-card" id="brecha-card">
+    <div class="brecha-header">
+      <div class="brecha-titulo">Tu pensión estimada al jubilarte</div>
+      <div class="brecha-num" id="brecha-pension">$0</div>
+      <div class="brecha-sub" id="brecha-sub">al mes</div>
+    </div>
+    <div class="brecha-body">
+
+      <div class="bar-row">
+        <div class="bar-labels">
+          <span class="bar-label">Tu pensión estimada</span>
+          <span class="bar-val" id="bar-pension-val" style="color:var(--rojo);">$0</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill pension" id="bar-pension" style="width:0%"></div></div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-labels">
+          <span class="bar-label">Tu número de la libertad</span>
+          <span class="bar-val" id="bar-libertad-val" style="color:var(--azul);">$0</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill libertad" id="bar-libertad" style="width:100%"></div></div>
+      </div>
+
+      <div class="gap-alerta">
+        <div class="gap-titulo">⚠️ Tu brecha pensional mensual</div>
+        <div class="gap-num" id="gap-num">$0</div>
+        <div class="gap-desc" id="gap-desc">al mes que tendrías que cubrir con otras fuentes de ingreso o ahorro.</div>
+      </div>
+
+      <div class="contexto-femenino">
+        <p>En Colombia, las mujeres reciben en promedio <strong>un 23% menos de pensión que los hombres</strong> — el resultado acumulado de salarios más bajos, trabajos informales y pausas laborales para cuidar a otros. Este hueco no es un error tuyo. Pero cerrarlo sí depende de ti.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFLEXIÓN -->
+  <div class="card" id="reflexion-card" style="display:none;">
+    <div class="card-label">Tu reflexión del día</div>
+    <div class="card-title">¿Qué vas a hacer con este número?</div>
+    <p class="card-body">No tienes que tener la respuesta perfecta. Pero hay algo que sientes o que quieres hacer diferente después de ver tu hueco pensional. ¿Qué es?</p>
+    <textarea class="reflection-area" id="reflection" placeholder="Escribe acá tu respuesta — nadie más la ve." oninput="guardarTexto()"></textarea>
+    <button class="btn-primary" id="save-btn" onclick="guardar()">✓ Completar el Día 4 y ganar mi punto</button>
+  </div>
+
+  <!-- CELEBRACIÓN -->
+  <div class="celebracion" id="celebracion">
+    <div class="celebracion-emoji">⚠️✅</div>
+    <div class="celebracion-title" id="cel-title">Ya viste el hueco. Eso ya es un acto de valentía.</div>
+    <div class="celebracion-sub">La mayoría nunca hace este ejercicio. Tú lo hiciste hoy. Cuéntaselo a la comunidad.</div>
+    <div class="wa-steps">
+      <div>
+        <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
+        <div class="msg-box" id="wa-msg">Hice el Día 4 del Reto Feminversario 📊
+
+Calculé mi brecha pensional — la diferencia entre lo que recibiría al jubilarme y lo que realmente necesito para vivir.
+
+No lo sabía. Ahora lo sé. Y eso cambia todo.
+
+¿Ya hiciste el tuyo?
+#RetoFeminversario</div>
+        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
+      </div>
+      <div>
+        <div class="wa-step-label">Paso 2 · Ábrelo en el grupo</div>
+        <a class="btn-wa-grupo" href="https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN" target="_blank">💬 Abrir grupo del reto en WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-menta" id="manana-card" style="display:none;">
+    <div class="menta-label">Mañana · Día 5 · El más diferente</div>
+    <div class="card-title" style="font-size:15px;">Mañana no reflexionamos. Mañana hacemos.</div>
+    <p class="card-body">El día 5 es el único del reto donde la tarea no es pensar — es tomar una acción financiera real hoy. Abrir una cuenta, hacer tu primera inversión, configurar un ahorro automático. Lo que sea, pero algo real.</p>
+    <p class="card-body" style="margin-top:8px;color:#4a7a2a;font-weight:600;">Si quieres llegar lista: descarga la app de Trii o la plataforma de inversión que uses. Mañana la necesitas.</p>
+  </div>
+
+  <div class="footer">
+    <div class="day-nav">
+      <span class="nav-label">Día 4</span>
+      <div class="dots">
+        <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <span class="nav-label">7 días</span>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:#c0bbd0;">Feminario · Reto Feminversario · Mayo 2026</p>
+  </div>
+</div>
+
+<script>
+let tipoFondo = '';
+function fmt(n){return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
+function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+
+function actualizarProgreso(){
+  const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
+  const pts=dias.filter(d=>load(d)==='1').length;
+  document.getElementById('progress-fill').style.width=(pts/7*100)+'%';
+  document.getElementById('progress-pts').textContent=pts+'/7 ⭐';
+  dias.forEach((d,i)=>{
+    const c=document.getElementById('chip'+(i+1));
+    if(!c) return;
+    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='✓';}
+    else if(i===3 && load(d)!=='1'){c.classList.add('active');}
+  });
+}
+
+function seleccionarFondo(tipo){
+  tipoFondo = tipo;
+  save('femi_d4_tipo', tipo);
+  document.querySelectorAll('.fondo-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('btn-'+tipo).classList.add('selected');
+  // Guías
+  document.querySelectorAll('.guia-box').forEach(g=>g.classList.remove('visible'));
+  document.getElementById('guia-'+tipo).classList.add('visible');
+  // Inputs
+  document.getElementById('datos-card').style.display='block';
+  document.querySelectorAll('.input-section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('input-'+tipo).classList.add('visible');
+  // Pre-llenar salario
+  const salD2=load('femi_d2_salario')||load('femi_d3_salario');
+  if(salD2){
+    if(tipo==='colpensiones'){
+      document.getElementById('sal-col').value=salD2;
+      document.getElementById('sal-col-hint').textContent='Pre-llenado desde el Día 2';
+    } else {
+      document.getElementById('sal-priv').value=salD2;
+      document.getElementById('sal-priv-hint').textContent='Pre-llenado desde el Día 2';
+    }
+  }
+  calcularBrecha();
+}
+
+function calcularBrecha(){
+  const libertad = parseFloat(load('femi_d1_numero'))||0;
+  let pensionEstimada = 0;
+
+  if(tipoFondo==='colpensiones'){
+    const semanas=parseFloat(document.getElementById('semanas').value)||0;
+    const edad=parseFloat(document.getElementById('edad-col').value)||0;
+    const sal=parseFloat(document.getElementById('sal-col').value)||0;
+    if(!semanas||!edad||!sal) return;
+    const semanasTotal=semanas + (62-edad)*52; // proyectar cotizando hasta los 62
+    const tasaReem = Math.min(0.65 + (Math.min(semanasTotal,1800)-1300)*0.015/100, 0.80);
+    pensionEstimada = Math.max(sal * tasaReem, 1423500); // mínimo 1 SMMLV
+    save('femi_d4_semanas', semanas);
+    save('femi_d4_edad', edad);
+    save('femi_d4_sal', sal);
+  } else {
+    const saldo=parseFloat(document.getElementById('saldo').value)||0;
+    const edad=parseFloat(document.getElementById('edad-priv').value)||0;
+    const sal=parseFloat(document.getElementById('sal-priv').value)||0;
+    if(!saldo||!edad) return;
+    // Proyección: saldo actual + aportes futuros (16% sal × meses) hasta retiro 60 años
+    const mesesRestantes = Math.max((60-edad)*12, 0);
+    const aporteMensual = sal * 0.16;
+    // Proyección simple con rendimiento 6% anual
+    const r = 0.06/12;
+    const saldoFuturo = saldo*Math.pow(1+r,mesesRestantes) + (r>0 ? aporteMensual*(Math.pow(1+r,mesesRestantes)-1)/r : aporteMensual*mesesRestantes);
+    // Pension = saldo futuro / 240 meses (20 años esperados)
+    pensionEstimada = saldoFuturo / 240;
+    save('femi_d4_saldo', saldo);
+    save('femi_d4_edad', edad);
+    save('femi_d4_sal', sal);
+  }
+
+  save('femi_d4_pension', pensionEstimada);
+  mostrarBrecha(pensionEstimada, libertad);
+}
+
+function mostrarBrecha(pension, libertad){
+  const maxBar = Math.max(pension, libertad) * 1.1;
+  const brecha = Math.max(libertad - pension, 0);
+  const suficiente = pension >= libertad;
+
+  document.getElementById('brecha-pension').textContent = fmt(pension);
+  document.getElementById('bar-pension-val').textContent = fmt(pension);
+  document.getElementById('bar-libertad-val').textContent = libertad>0 ? fmt(libertad) : 'Completa el Día 1';
+  document.getElementById('bar-pension').style.width = (pension/maxBar*100)+'%';
+  document.getElementById('bar-libertad').style.width = libertad>0 ? (libertad/maxBar*100)+'%' : '70%';
+  document.getElementById('gap-num').textContent = suficiente ? '¡Sin brecha!' : fmt(brecha);
+  document.getElementById('gap-desc').textContent = suficiente
+    ? 'Tu pensión estimada cubre tu número de la libertad. Igual vale la pena seguir construyendo.'
+    : `al mes que necesitarías cubrir con inversiones u otras fuentes. ${libertad===0?'(Completa el Día 1 para ver tu número de la libertad.)':''}`;
+  document.getElementById('gap-num').style.color = suficiente ? '#4a9e6e' : 'var(--rojo)';
+  document.getElementById('gap-alerta').style.borderColor = suficiente ? '#4a9e6e' : 'var(--rojo)';
+  document.getElementById('gap-alerta').style.background = suficiente ? 'rgba(74,158,110,.08)' : 'var(--rojo-l)';
+  document.getElementById('gap-titulo').style.color = suficiente ? '#4a9e6e' : 'var(--rojo)';
+  document.getElementById('gap-titulo').textContent = suficiente ? '✅ Tu situación pensional' : '⚠️ Tu brecha pensional mensual';
+
+  document.getElementById('brecha-card').classList.add('visible');
+  document.getElementById('reflexion-card').style.display='block';
+  document.getElementById('manana-card').style.display='block';
+}
+
+function guardarTexto(){save('femi_d4_reflexion',document.getElementById('reflection').value);}
+
+function copiarMensaje(){
+  const txt=document.getElementById('wa-msg').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    document.getElementById('copy-btn').textContent='✅ ¡Copiado! Ahora pégalo en el grupo';
+  }).catch(()=>{
+    const r=document.createRange();r.selectNode(document.getElementById('wa-msg'));
+    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+    document.execCommand('copy');
+    document.getElementById('copy-btn').textContent='✅ ¡Copiado!';
+  });
+}
+
+function guardar(){
+  const btn=document.getElementById('save-btn');
+  if(!load('femi_d4_pension')){
+    btn.textContent='Primero calcula tu brecha pensional ↑';
+    btn.style.background='#b07040';
+    setTimeout(()=>{btn.textContent='✓ Completar el Día 4 y ganar mi punto';btn.style.background='';},2200);
+    return;
+  }
+  save('femi_d4_listo','1');
+  btn.textContent='✓ ¡Día 4 completado! +1 punto';
+  btn.classList.add('saved');
+  actualizarProgreso();
+  const nombre=load('femi_nombre')||'';
+  document.getElementById('cel-title').textContent='Ya viste el hueco'+(nombre?', '+nombre:'')+'.\nEso ya es un acto de valentía.';
+  const cel=document.getElementById('celebracion');
+  cel.classList.add('visible');
+  cel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+window.addEventListener('load',()=>{
+  actualizarProgreso();
+  const tipo=load('femi_d4_tipo');
+  const r=load('femi_d4_reflexion');
+  if(r) document.getElementById('reflection').value=r;
+  if(tipo) seleccionarFondo(tipo);
+  if(load('femi_d4_listo')==='1'){
+    const btn=document.getElementById('save-btn');
+    btn.textContent='✓ ¡Día 4 completado! +1 punto';
+    btn.classList.add('saved');
+    const nombre=load('femi_nombre')||'';
+    document.getElementById('cel-title').textContent='Ya viste el hueco'+(nombre?', '+nombre:'')+'.\nEso ya es un acto de valentía.';
+    document.getElementById('celebracion').classList.add('visible');
+  }
+});
+</script>
+</body>
+</html>
