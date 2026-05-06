@@ -245,17 +245,19 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
     <div class="card-label">Paso 1 &middot; Tu fondo ideal</div>
     <div class="card-title">Calculemos tu colch&oacute;n exacto</div>
 
+    <!-- Pre-llenado inteligente desde días anteriores -->
+    <div id="prellenado-box" style="display:none;background:var(--crema-l);border:1px solid var(--dorado);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+      <p style="font-size:10px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;" id="prellenado-origen"></p>
+      <p style="font-size:13px;font-weight:700;color:var(--texto);" id="prellenado-valor"></p>
+      <p style="font-size:11px;color:var(--muted);margin-top:3px;" id="prellenado-desc"></p>
+      <button onclick="usarPrellenado()" style="margin-top:8px;padding:6px 14px;background:var(--azul);border:none;border-radius:8px;color:white;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">Usar este n&uacute;mero</button>
+      <button onclick="ignorarPrellenado()" style="margin-top:8px;margin-left:6px;padding:6px 14px;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">Ingresar otro</button>
+    </div>
+
     <div class="input-group">
       <label class="input-label">&#128176; Tus gastos mensuales reales</label>
       <input class="calc-input" type="number" id="gastos-mes" placeholder="$ 0" oninput="calcularFondo()">
-      <span class="input-hint" id="gastos-hint">Lo encontramos en el D&iacute;a 2 &#8212; carg&aacute;ndolo...</span>
-    </div>
-
-    <!-- Gastos del día 2 si los hay -->
-    <div id="gastos-d2-box" style="display:none;background:var(--crema-l);border-radius:10px;padding:12px;margin-bottom:12px;">
-      <p style="font-size:11px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Tus gastos del D&iacute;a 2</p>
-      <div class="gastos-lista" id="gastos-d2-lista"></div>
-      <p style="font-size:10px;color:var(--muted);margin-top:8px;">Total registrado: <strong id="gastos-d2-total"></strong> &mdash; pre-llenado arriba.</p>
+      <span class="input-hint" id="gastos-hint">Cuánto gastas en un mes normal &mdash; vivienda, comida, transporte, todo.</span>
     </div>
 
     <label class="input-label" style="margin-bottom:8px;">&#128197; &iquest;Cu&aacute;ntos meses quieres cubrir?</label>
@@ -288,6 +290,13 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
       </div>
       <div class="fondo-body">
 
+        <!-- ¿CUÁNTO TIENES? — va primero para que la barra tenga sentido -->
+        <div class="input-group" style="margin-bottom:16px;">
+          <label class="input-label">&#128200; &iquest;Cu&aacute;nto tienes ahorrado hoy para este fondo?</label>
+          <input class="calc-input" type="number" id="ahorro-actual" placeholder="$ 0" oninput="actualizarProgreso6()">
+          <span class="input-hint">En cuenta de ahorros, efectivo o fiducuenta. No cuentes tus inversiones.</span>
+        </div>
+
         <!-- BARRA PROGRESO -->
         <div class="barra-fondo">
           <div class="barra-labels">
@@ -318,13 +327,6 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
           </div>
         </div>
 
-        <!-- ¿CUÁNTO TIENES? -->
-        <div class="input-group" style="margin-top:4px;">
-          <label class="input-label">&#128200; &iquest;Cu&aacute;nto tienes ahorrado hoy para emergencias?</label>
-          <input class="calc-input" type="number" id="ahorro-actual" placeholder="$ 0" oninput="actualizarProgreso6()">
-          <span class="input-hint">En cuenta de ahorros, efectivo o CDT. No cuentes tus inversiones.</span>
-        </div>
-
         <!-- CUÁNTO AHORRAR MENSUALMENTE -->
         <div id="plan-ahorro-box" style="display:none;margin-top:8px;">
           <p style="font-size:11px;font-weight:700;color:var(--texto);margin-bottom:8px;">Si ahorras mensualmente para llegar a tu meta:</p>
@@ -351,7 +353,7 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
         <div class="nota-liquido">
           <div class="nota-icon">&#9888;&#65039;</div>
           <div class="nota-texto">
-            <strong>Este dinero no se invierte.</strong> Va en una cuenta de ahorros normal, un CDT de 30 d&iacute;as, o debajo del colch&oacute;n digital. Necesitas poder accederlo en 24 horas. El rendimiento aqu&iacute; es irrelevante &mdash; la liquidez lo es todo.
+            <strong>Este dinero no se invierte en la bolsa.</strong> Va en una cuenta de ahorros de alto rendimiento o en una fiducuenta. Necesitas poder accederlo inmediatamente. La liquidez en este caso prima por encima de la rentabilidad.
           </div>
         </div>
       </div>
@@ -493,41 +495,59 @@ function mostrarResumen(){
   if(libertad) document.getElementById('res-brecha').textContent=brecha>0?fmtC(brecha):'\u2705 Sin brecha';
 }
 
-/* ── GASTOS DÍA 2 ─────────────────────────── */
-function cargarGastosD2(){
+/* ── PREFILL INTELIGENTE ──────────────────── */
+// Prioridad: 1) número de la libertad D1  2) total gastos D2  3) 75% salario D2/D3
+let _prellenadoValor=0;
+
+function mostrarPrellenado(){
+  const libertad=parseFloat(load('femi_d1_numero'))||0;
   const raw=load('femi_d2_gastos');
-  const salario=parseFloat(load('femi_d2_salario'))||0;
-  if(raw){
+  const salario=parseFloat(load('femi_d2_salario'))||parseFloat(load('femi_d3_salario'))||0;
+
+  let valor=0, origen='', desc='';
+
+  if(libertad>0){
+    valor=libertad;
+    origen='Desde el D\u00eda 1 &middot; Tu n\u00famero de la libertad';
+    desc='Este es el gasto mensual con el que quieres vivir. Es la mejor base para tu fondo.';
+  } else {
     try{
-      const datos=JSON.parse(raw);
-      if(datos.length>0){
-        const total=datos.reduce((s,g)=>s+(g.v||0),0);
-        const box=document.getElementById('gastos-d2-box');
-        const lista=document.getElementById('gastos-d2-lista');
-        lista.innerHTML='';
-        datos.slice(0,6).forEach(g=>{
-          const div=document.createElement('div');
-          div.className='gasto-item';
-          div.innerHTML=`<span class="gasto-nombre">${g.n||'Gasto'}</span><span class="gasto-valor">${fmt(g.v)}</span>`;
-          lista.appendChild(div);
-        });
-        document.getElementById('gastos-d2-total').textContent=fmt(total);
-        box.style.display='block';
-        // Pre-fill input
-        const input=document.getElementById('gastos-mes');
-        input.value=total;
-        document.getElementById('gastos-hint').textContent='Pre-llenado con tus gastos del D\u00eda 2';
-        gastosMes=total;
-        calcularFondo();
-        return total;
+      if(raw){
+        const datos=JSON.parse(raw);
+        if(datos.length>0){
+          const total=datos.reduce((s,g)=>s+(g.v||0),0);
+          if(total>0){valor=total;origen='Desde el D\u00eda 2 &middot; Total de tus gastos registrados';desc='La suma de los gastos que ingresaste en el conversor del D\u00eda 2.';}
+        }
       }
     }catch(e){}
   }
-  // Si no hay gastos del D2 pero hay salario, sugerir
-  if(salario){
-    document.getElementById('gastos-hint').textContent='Sugerencia: entre el 70-80% de tu salario ('+fmt(salario*0.75)+' aprox)';
+
+  if(!valor&&salario>0){
+    valor=Math.round(salario*0.75);
+    origen='Sugerencia basada en tu salario';
+    desc='El 75% de tu salario es una estimaci\u00f3n habitual de los gastos reales. Aj\u00fastalo si sabes tu n\u00famero exacto.';
   }
-  return 0;
+
+  if(valor>0){
+    _prellenadoValor=valor;
+    const box=document.getElementById('prellenado-box');
+    box.style.display='block';
+    document.getElementById('prellenado-origen').innerHTML=origen;
+    document.getElementById('prellenado-valor').textContent=fmt(valor)+' al mes';
+    document.getElementById('prellenado-desc').textContent=desc;
+  }
+}
+
+function usarPrellenado(){
+  document.getElementById('gastos-mes').value=_prellenadoValor;
+  document.getElementById('prellenado-box').style.display='none';
+  gastosMes=_prellenadoValor;
+  calcularFondo();
+}
+
+function ignorarPrellenado(){
+  document.getElementById('prellenado-box').style.display='none';
+  document.getElementById('gastos-mes').focus();
 }
 
 /* ── SELECTOR MESES ───────────────────────── */
@@ -685,17 +705,15 @@ window.addEventListener('load',()=>{
     if(btn) btn.classList.toggle('selected',m===mesesG);
   });
 
-  // Cargar gastos del día 2 (o restaurar si ya ingresó manualmente)
+  // Restaurar gastos o mostrar sugerencia pre-llenada
   const gastosG=load('femi_d6_gastos');
   if(gastosG){
     document.getElementById('gastos-mes').value=gastosG;
     document.getElementById('gastos-hint').textContent='Datos guardados';
     gastosMes=parseFloat(gastosG);
-    // Aun así mostrar los gastos del D2 si existen
-    cargarGastosD2();
     calcularFondo();
   } else {
-    cargarGastosD2();
+    mostrarPrellenado();
   }
 
   // Restaurar ahorro actual
