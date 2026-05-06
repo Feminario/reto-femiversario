@@ -414,7 +414,6 @@ function guardar(){
 
 window.addEventListener('load',()=>{
   actualizarProgreso();
-  inicializarConversor();
 
   // Restaurar
   const vh=parseFloat(load('femi_d2_hora'))||0;
@@ -424,6 +423,21 @@ window.addEventListener('load',()=>{
   if(hrs){ document.getElementById('horas').value=hrs; }
   const r=load('femi_d2_reflexion');
   if(r) document.getElementById('reflection').value=r;
+
+  // Restaurar gastos guardados (nombre + valor) en el conversor
+  const gastosGuardados=load('femi_d2_gastos');
+  if(gastosGuardados){
+    try{
+      const datos=JSON.parse(gastosGuardados);
+      const conv=document.getElementById('conversor');
+      conv.innerHTML='<div class="conversor-title" style="margin-top:12px;">Nombre → Valor → Horas de tu vida</div>';
+      datos.forEach(g=>conv.appendChild(crearFilaGasto(g.n,g.v)));
+      // Filas vacías extra
+      for(let i=0;i<3;i++) conv.appendChild(crearFilaGasto());
+    }catch(e){inicializarConversor();}
+  } else {
+    inicializarConversor();
+  }
 
   if(vh>0){
     valorHora=vh;
