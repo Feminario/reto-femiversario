@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --azul:#7E84AE;--azul-l:#C2CBFF;--lila:#CEA2DD;--menta:#DFF3AF;
+  --naranja:#F59356;--crema:#FFEAD2;--crema-l:#FFF7EF;
+  --lila-l:#F9E1FF;--dorado:#F7C175;
+  --texto:#2B2040;--muted:#6B6080;--border:rgba(126,132,174,0.2);
+  --verde:#4a9e6e;--verde-l:rgba(74,158,110,.08);--rojo:#E05050;--rojo-l:#FFF0F0;
+}
+body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-serif;min-height:100vh;padding-bottom:48px;}
+
+/* PROGRESS */
+.progress-bar-wrap{position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(126,132,174,.08);}
+.progress-label{font-size:11px;font-weight:700;color:var(--azul);white-space:nowrap;}
+.progress-track{flex:1;height:8px;background:var(--crema);border-radius:8px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--azul) 0%,var(--lila) 100%);transition:width .6s cubic-bezier(.4,0,.2,1);}
+.progress-pts{font-size:12px;font-weight:700;color:var(--azul);white-space:nowrap;min-width:36px;text-align:right;}
+.day-chips{display:flex;gap:4px;padding:0 16px 8px;background:white;justify-content:center;border-bottom:1px solid var(--border);}
+.chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .3s;}
+.chip.done{background:var(--azul);border-color:var(--azul);color:white;}
+.chip.active{border-color:var(--naranja);color:var(--naranja);}
+
+/* HEADER — gradiente día 6: casi al final, más rico y profundo */
+.header{background:linear-gradient(135deg,#160c36 0%,#2a1060 45%,#8040c0 100%);padding:20px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:var(--crema-l);border-radius:20px 20px 0 0;}
+.logo-text{font-size:20px;font-weight:700;color:white;letter-spacing:.04em;}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.65);letter-spacing:.05em;margin-top:2px;margin-bottom:14px;}
+.header-pill{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:10px;color:white;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.header-title{font-size:clamp(20px,5vw,30px);font-weight:700;color:white;line-height:1.2;margin-bottom:6px;}
+.header-title em{font-style:italic;font-weight:400;color:var(--dorado);}
+.header-sub-text{font-size:12px;color:rgba(255,255,255,.8);}
+
+/* BASE */
+.content{max-width:600px;margin:0 auto;padding:20px 16px 0;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(126,132,174,.06);}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul);margin-bottom:6px;}
+.card-title{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:10px;line-height:1.3;}
+.card-body{font-size:13px;color:var(--muted);line-height:1.8;}
+.card-body strong{color:var(--texto);font-weight:600;}
+.callout{background:var(--lila-l);border-left:3px solid var(--lila);border-radius:0 10px 10px 0;padding:14px 16px;margin-top:14px;font-size:13px;color:var(--texto);line-height:1.7;font-weight:500;}
+
+/* RESUMEN SEMANA */
+.semana-resumen{background:linear-gradient(135deg,#160c36,#2a1060);border-radius:16px;padding:18px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.resumen-item{background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center;}
+.resumen-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.resumen-valor{font-size:14px;font-weight:700;color:white;line-height:1.2;}
+.resumen-sub{font-size:9px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+/* CALCULADORA FONDO */
+.calc-input{background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;width:100%;transition:border-color .15s;-moz-appearance:textfield;}
+.calc-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.calc-input:focus{outline:none;border-color:var(--azul);background:white;}
+.calc-input::placeholder{color:#c0bbd0;font-weight:400;}
+.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.input-label{font-size:11px;color:var(--muted);font-weight:600;}
+.input-hint{font-size:10px;color:#c0bbd0;margin-top:2px;}
+
+/* MESES SELECTOR */
+.meses-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0;}
+.mes-btn{border:2px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s;background:var(--crema-l);}
+.mes-btn:hover{border-color:var(--azul);}
+.mes-btn.selected{border-color:var(--azul);background:rgba(126,132,174,.1);}
+.mes-num{font-size:20px;font-weight:700;color:var(--azul);}
+.mes-label{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* RESULTADO FONDO */
+.fondo-result{display:none;margin-top:4px;}
+.fondo-result.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
+@keyframes pop{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+.fondo-header{border-radius:14px 14px 0 0;padding:18px;text-align:center;}
+.fondo-header.ok{background:linear-gradient(135deg,#2d6a4f,#4a9e6e);}
+.fondo-header.cerca{background:linear-gradient(135deg,#7a5000,var(--naranja));}
+.fondo-header.lejos{background:linear-gradient(135deg,#7a1020,var(--rojo));}
+.fondo-emoji{font-size:28px;margin-bottom:6px;}
+.fondo-titulo{font-size:13px;font-weight:700;color:white;margin-bottom:3px;}
+.fondo-meta-num{font-size:34px;font-weight:700;color:white;line-height:1;}
+.fondo-meta-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:4px;}
+
+.fondo-body{background:white;border:1px solid var(--border);border-radius:0 0 14px 14px;padding:16px;margin-bottom:14px;}
+
+/* BARRA PROGRESO FONDO */
+.barra-fondo{margin:14px 0;}
+.barra-labels{display:flex;justify-content:space-between;margin-bottom:5px;}
+.barra-label{font-size:11px;color:var(--muted);font-weight:500;}
+.barra-val{font-size:11px;font-weight:700;}
+.barra-track{height:14px;background:var(--crema);border-radius:14px;overflow:hidden;position:relative;}
+.barra-fill{height:100%;border-radius:14px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.barra-pct{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:white;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+
+/* DIAGNÓSTICO */
+.diagnostico-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0;}
+.diag-item{border-radius:12px;padding:12px 10px;text-align:center;}
+.diag-label{font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px;}
+.diag-valor{font-size:16px;font-weight:700;}
+.diag-sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+/* GASTOS DEL DÍA 2 */
+.gastos-lista{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.gasto-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--crema-l);border-radius:8px;font-size:12px;}
+.gasto-nombre{color:var(--muted);}
+.gasto-valor{font-weight:700;color:var(--texto);}
+
+/* PLAN DE ACCIÓN */
+.plan-opciones{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.plan-opcion{border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;background:var(--crema-l);}
+.plan-opcion:hover{border-color:var(--azul);}
+.plan-opcion.selected{border-color:var(--verde);background:var(--verde-l);}
+.plan-opcion-titulo{font-size:13px;font-weight:700;color:var(--texto);margin-bottom:3px;}
+.plan-opcion-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.plan-opcion-tag{display:inline-block;margin-top:5px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--menta);color:#2d5a1a;}
+
+/* ACCIÓN COMPROMETIDA */
+.accion-card{display:none;}
+.accion-card.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
+.accion-inner{background:linear-gradient(135deg,#e8f5e9,var(--menta));border:2px solid #7abf45;border-radius:14px;padding:16px;margin-top:14px;}
+.accion-emoji{font-size:24px;margin-bottom:6px;}
+.accion-titulo{font-size:14px;font-weight:700;color:#2d5a1a;margin-bottom:4px;}
+.accion-detalle{font-size:12px;color:#4a7a2a;line-height:1.6;}
+
+/* AHORRO MENSUAL */
+.ahorro-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0;}
+.ahorro-box{border-radius:10px;padding:10px 8px;text-align:center;border:1.5px solid var(--border);}
+.ahorro-plazo{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.ahorro-monto{font-size:15px;font-weight:700;line-height:1;}
+.ahorro-label{font-size:9px;color:var(--muted);margin-top:3px;}
+
+/* NOTA LIQUID */
+.nota-liquido{background:var(--crema);border:1px solid var(--dorado);border-radius:12px;padding:14px;margin-top:12px;display:flex;gap:10px;align-items:flex-start;}
+.nota-icon{font-size:18px;flex-shrink:0;}
+.nota-texto{font-size:12px;color:var(--muted);line-height:1.6;}
+.nota-texto strong{color:var(--texto);}
+
+/* REFLEXIÓN + BOTONES */
+.reflection-area{width:100%;background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.7;resize:vertical;min-height:70px;margin-top:12px;transition:border-color .15s;}
+.reflection-area:focus{outline:none;border-color:var(--azul);background:white;}
+.reflection-area::placeholder{color:#c0bbd0;}
+.btn-primary{display:block;width:100%;margin-top:12px;padding:14px;background:var(--naranja);border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;}
+.btn-primary:hover{background:#e07d3d;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary.saved{background:var(--verde);}
+
+/* CELEBRACIÓN */
+.celebracion{display:none;margin-top:14px;background:linear-gradient(135deg,var(--menta) 0%,var(--crema) 100%);border:2px solid #7abf45;border-radius:16px;padding:20px;}
+.celebracion.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
+.celebracion-emoji{font-size:36px;margin-bottom:8px;text-align:center;}
+.celebracion-title{font-size:16px;font-weight:700;color:#2d5a1a;margin-bottom:6px;text-align:center;}
+.celebracion-sub{font-size:12px;color:#4a7a2a;line-height:1.7;margin-bottom:16px;text-align:center;}
+.wa-steps{display:flex;flex-direction:column;gap:10px;}
+.wa-step-label{font-size:10px;font-weight:700;color:#4a7a2a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.msg-box{background:white;border:1px solid #7abf45;border-radius:10px;padding:12px 14px;font-size:12px;color:var(--texto);line-height:1.7;white-space:pre-line;}
+.btn-copy{display:block;width:100%;margin-top:8px;padding:10px;background:white;border:2px solid #7abf45;border-radius:10px;color:#2d5a1a;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-copy:hover{background:var(--menta);}
+.btn-wa-grupo{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#25D366;border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;}
+.btn-wa-grupo:hover{background:#1db954;}
+
+/* MAÑANA */
+.card-menta{background:white;border:1.5px solid var(--menta);border-radius:16px;padding:18px 20px;margin-bottom:14px;}
+.menta-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4a7a2a;margin-bottom:6px;}
+
+/* FOOTER */
+.footer{text-align:center;padding:16px 0 0;border-top:1px solid var(--border);margin-top:6px;}
+.day-nav{display:flex;justify-content:space-between;align-items:center;}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);}
+.dot.done{background:var(--azul);}
+.dot.active{background:var(--azul);width:20px;border-radius:3px;}
+.nav-label{font-size:11px;color:var(--muted);font-weight:500;}
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap">
+  <span class="progress-label">Tu progreso</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <span class="progress-pts" id="progress-pts">0/7 &#11088;</span>
+</div>
+<div class="day-chips">
+  <div class="chip" id="chip1">1</div><div class="chip" id="chip2">2</div>
+  <div class="chip" id="chip3">3</div><div class="chip" id="chip4">4</div>
+  <div class="chip" id="chip5">5</div>
+  <div class="chip active" id="chip6">6</div><div class="chip" id="chip7">7</div>
+</div>
+
+<div class="header">
+  <div class="logo-text">feminario</div>
+  <div class="logo-sub">el espacio seguro donde las mujeres redefinimos la autonomía económica</div>
+  <div class="header-pill">Reto Feminversario &middot; D&iacute;a 6 de 7 &middot; 15 de mayo</div>
+  <h1 class="header-title">Tu <em>red de seguridad</em></h1>
+  <p class="header-sub-text">Porque invertir sin un colch&oacute;n es construir sin cimientos.</p>
+</div>
+
+<div class="content">
+
+  <!-- RESUMEN SEMANA -->
+  <div class="semana-resumen" id="semana-resumen" style="display:none;">
+    <div class="resumen-item">
+      <div class="resumen-label">Libertad mensual</div>
+      <div class="resumen-valor" id="res-libertad">&#8212;</div>
+      <div class="resumen-sub">tu n&uacute;mero del d&iacute;a 1</div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-label">Tu salario actual</div>
+      <div class="resumen-valor" id="res-salario">&#8212;</div>
+      <div class="resumen-sub">base del c&aacute;lculo</div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-label">Pensi&oacute;n estimada</div>
+      <div class="resumen-valor" id="res-pension">&#8212;</div>
+      <div class="resumen-sub">del d&iacute;a 4</div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-label">Brecha pensional</div>
+      <div class="resumen-valor" id="res-brecha">&#8212;</div>
+      <div class="resumen-sub">a cerrar invirtiendo</div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="card">
+    <div class="card-label">El complemento del d&iacute;a 5</div>
+    <div class="card-title">Invertir sin red de seguridad es el error m&aacute;s com&uacute;n.</div>
+    <p class="card-body">
+      Imagina que pones 500.000 pesos a trabajar en tu cuenta de inversiones. Se ven bien. Pero llega una emergencia — el carro, la salud, un mes sin trabajo — y tienes que retirar todo antes de que rinda. Perdiste el momento. Perdiste el interés compuesto.<br><br>
+      El fondo de emergencia es el escudo que protege tu inversión. <strong>No se invierte</strong>. No busca rendimiento. Su único trabajo es estar ahí cuando lo necesitas, en una cuenta líquida a la que puedas acceder en 24 horas.
+    </p>
+    <div style="margin-top:16px;background:linear-gradient(135deg,#160c36,#2a1060);border-radius:14px;padding:18px 20px;">
+      <p style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px;">En Feminario lo llamamos</p>
+      <p style="font-size:18px;font-weight:700;color:var(--dorado);margin-bottom:10px;line-height:1.2;">El fondo para la autonom&iacute;a &#128156;</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.82);line-height:1.8;">No es solo para emergencias. Es el colch&oacute;n que te permite <strong style="color:white;">decidir con libertad</strong> sobre tu propia vida.<br><br>Salir de un trabajo que ya no te llena. Terminar una relaci&oacute;n que no te hace bien. Dejar una casa, una ciudad, una situaci&oacute;n que ya no va contigo. <strong style="color:white;">Sin tener que pedirle permiso a nadie &mdash; porque tienes con qu&eacute; sostenerte mientras tu vida cambia.</strong><br><br>Esa es la diferencia entre resistir y elegir.</p>
+    </div>
+    <div class="callout" style="margin-top:12px;">
+      &#128737;&#65039; La regla: entre 3 y 6 meses de tus gastos reales. No de tu salario — de lo que realmente gastas. Hoy calculas ese número exacto con los datos que ya tienes.
+    </div>
+  </div>
+
+  <!-- CALCULADORA FONDO DE EMERGENCIA -->
+  <div class="card">
+    <div class="card-label">Paso 1 &middot; Tu fondo ideal</div>
+    <div class="card-title">Calculemos tu colch&oacute;n exacto</div>
+
+    <div class="input-group">
+      <label class="input-label">&#128176; Tus gastos mensuales reales</label>
+      <input class="calc-input" type="number" id="gastos-mes" placeholder="$ 0" oninput="calcularFondo()">
+      <span class="input-hint" id="gastos-hint">Lo encontramos en el D&iacute;a 2 &#8212; carg&aacute;ndolo...</span>
+    </div>
+
+    <!-- Gastos del día 2 si los hay -->
+    <div id="gastos-d2-box" style="display:none;background:var(--crema-l);border-radius:10px;padding:12px;margin-bottom:12px;">
+      <p style="font-size:11px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Tus gastos del D&iacute;a 2</p>
+      <div class="gastos-lista" id="gastos-d2-lista"></div>
+      <p style="font-size:10px;color:var(--muted);margin-top:8px;">Total registrado: <strong id="gastos-d2-total"></strong> &mdash; pre-llenado arriba.</p>
+    </div>
+
+    <label class="input-label" style="margin-bottom:8px;">&#128197; &iquest;Cu&aacute;ntos meses quieres cubrir?</label>
+    <div class="meses-selector">
+      <div class="mes-btn" id="mes-3" onclick="seleccionarMeses(3)">
+        <div class="mes-num">3</div>
+        <div class="mes-label">meses</div>
+        <div class="mes-label" style="font-size:9px;color:var(--azul);font-weight:700;">m&iacute;nimo</div>
+      </div>
+      <div class="mes-btn selected" id="mes-6" onclick="seleccionarMeses(6)">
+        <div class="mes-num">6</div>
+        <div class="mes-label">meses</div>
+        <div class="mes-label" style="font-size:9px;color:var(--azul);font-weight:700;">recomendado</div>
+      </div>
+      <div class="mes-btn" id="mes-12" onclick="seleccionarMeses(12)">
+        <div class="mes-num">12</div>
+        <div class="mes-label">meses</div>
+        <div class="mes-label" style="font-size:9px;color:var(--azul);font-weight:700;">ideal</div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:12px;font-style:italic;">Las trabajadoras independientes o con ingresos variables deber&iacute;an apuntar a 9-12 meses.</p>
+
+    <!-- RESULTADO CALCULADORA -->
+    <div class="fondo-result" id="fondo-result">
+      <div class="fondo-header" id="fondo-header">
+        <div class="fondo-emoji" id="fondo-emoji">&#128737;&#65039;</div>
+        <div class="fondo-titulo" id="fondo-titulo">Tu fondo de emergencia ideal</div>
+        <div class="meta-res-monto fondo-meta-num" id="fondo-meta-num" style="font-size:34px;font-weight:700;color:white;line-height:1;margin:6px 0;"></div>
+        <div class="fondo-meta-sub" id="fondo-meta-sub"></div>
+      </div>
+      <div class="fondo-body">
+
+        <!-- BARRA PROGRESO -->
+        <div class="barra-fondo">
+          <div class="barra-labels">
+            <span class="barra-label">Lo que tienes hoy</span>
+            <span class="barra-val" id="barra-tienes-val" style="color:var(--verde);">$0</span>
+          </div>
+          <div class="barra-track">
+            <div class="barra-fill" id="barra-fill" style="width:0%;background:linear-gradient(90deg,var(--verde),#7abf45);"></div>
+            <span class="barra-pct" id="barra-pct"></span>
+          </div>
+          <div class="barra-labels" style="margin-top:4px;">
+            <span class="barra-label">Meta</span>
+            <span class="barra-val" id="barra-meta-val" style="color:var(--azul);">$0</span>
+          </div>
+        </div>
+
+        <!-- DIAGNÓSTICO -->
+        <div class="diagnostico-grid">
+          <div class="diag-item" style="background:var(--crema-l);">
+            <div class="diag-label">Lo que necesitas</div>
+            <div class="diag-valor" id="diag-meta" style="color:var(--azul);"></div>
+            <div class="diag-sub" id="diag-meta-sub"></div>
+          </div>
+          <div class="diag-item" style="background:var(--verde-l);border:1px solid rgba(74,158,110,.2);">
+            <div class="diag-label">Lo que te falta</div>
+            <div class="diag-valor" id="diag-falta" style="color:var(--rojo);"></div>
+            <div class="diag-sub" id="diag-falta-sub"></div>
+          </div>
+        </div>
+
+        <!-- ¿CUÁNTO TIENES? -->
+        <div class="input-group" style="margin-top:4px;">
+          <label class="input-label">&#128200; &iquest;Cu&aacute;nto tienes ahorrado hoy para emergencias?</label>
+          <input class="calc-input" type="number" id="ahorro-actual" placeholder="$ 0" oninput="actualizarProgreso6()">
+          <span class="input-hint">En cuenta de ahorros, efectivo o CDT. No cuentes tus inversiones.</span>
+        </div>
+
+        <!-- CUÁNTO AHORRAR MENSUALMENTE -->
+        <div id="plan-ahorro-box" style="display:none;margin-top:8px;">
+          <p style="font-size:11px;font-weight:700;color:var(--texto);margin-bottom:8px;">Si ahorras mensualmente para llegar a tu meta:</p>
+          <div class="ahorro-grid">
+            <div class="ahorro-box" style="background:var(--lila-l);border-color:var(--lila);">
+              <div class="ahorro-plazo">6 meses</div>
+              <div class="ahorro-monto" id="ahorro-6m" style="color:#7a40a0;"></div>
+              <div class="ahorro-label">al mes</div>
+            </div>
+            <div class="ahorro-box" style="background:rgba(245,147,86,.08);border-color:var(--naranja);">
+              <div class="ahorro-plazo" style="color:#b07040;">12 meses</div>
+              <div class="ahorro-monto" id="ahorro-12m" style="color:var(--naranja);"></div>
+              <div class="ahorro-label">al mes</div>
+            </div>
+            <div class="ahorro-box" style="background:var(--verde-l);border-color:rgba(74,158,110,.3);">
+              <div class="ahorro-plazo" style="color:#2d6a4f;">18 meses</div>
+              <div class="ahorro-monto" id="ahorro-18m" style="color:var(--verde);"></div>
+              <div class="ahorro-label">al mes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTA IMPORTANTE -->
+        <div class="nota-liquido">
+          <div class="nota-icon">&#9888;&#65039;</div>
+          <div class="nota-texto">
+            <strong>Este dinero no se invierte.</strong> Va en una cuenta de ahorros normal, un CDT de 30 d&iacute;as, o debajo del colch&oacute;n digital. Necesitas poder accederlo en 24 horas. El rendimiento aqu&iacute; es irrelevante &mdash; la liquidez lo es todo.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2: ACCIÓN CONCRETA -->
+  <div class="card" id="accion-card" style="display:none;">
+    <div class="card-label">Paso 2 &middot; Un paso hoy</div>
+    <div class="card-title">Algo peque&ntilde;o pero real. Eso es todo.</div>
+    <p class="card-body" style="margin-bottom:14px;">No tienes que llegar a la meta hoy. Tienes que moverte. Elige una acci&oacute;n que puedas tomar ahora mismo o antes de que termine el d&iacute;a:</p>
+
+    <div class="plan-opciones" id="plan-opciones">
+      <div class="plan-opcion" id="acc-1" onclick="elegirAccion(1)">
+        <div class="plan-opcion-titulo">&#127987;&#65039; Abrir una cuenta de ahorros separada para emergencias</div>
+        <div class="plan-opcion-desc">Una cuenta diferente a la del d&iacute;a a d&iacute;a. Solo para esto. El dinero que no ves, no lo gastas.</div>
+        <div class="plan-opcion-tag">&#9201; 10 minutos en la app de tu banco</div>
+      </div>
+      <div class="plan-opcion" id="acc-2" onclick="elegirAccion(2)">
+        <div class="plan-opcion-titulo">&#128260; Configurar una transferencia autom&aacute;tica mensual</div>
+        <div class="plan-opcion-desc">El mejor truco de las finanzas personales: lo que se ahorra solo, se ahorra de verdad. Prog&aacute;malo hoy para el pr&oacute;ximo pago de n&oacute;mina.</div>
+        <div class="plan-opcion-tag">&#9201; 5 minutos</div>
+      </div>
+      <div class="plan-opcion" id="acc-3" onclick="elegirAccion(3)">
+        <div class="plan-opcion-titulo">&#128176; Hacer mi primer dep&oacute;sito al fondo hoy mismo</div>
+        <div class="plan-opcion-desc">Aunque sea 20.000 pesos. El primer dep&oacute;sito es el m&aacute;s importante porque convierte la intenci&oacute;n en acci&oacute;n.</div>
+        <div class="plan-opcion-tag">&#9201; Ahora mismo</div>
+      </div>
+      <div class="plan-opcion" id="acc-4" onclick="elegirAccion(4)">
+        <div class="plan-opcion-titulo">&#128203; Calcular d&oacute;nde recorto para ahorrar este mes</div>
+        <div class="plan-opcion-desc">Revisar tus gastos del d&iacute;a 2 y decidir cu&aacute;l sacrificar para destinar ese monto al fondo. No eliminar &mdash; redirigir.</div>
+        <div class="plan-opcion-tag">&#9201; 15 minutos de reflexi&oacute;n</div>
+      </div>
+      <div class="plan-opcion" id="acc-5" onclick="elegirAccion(5)">
+        <div class="plan-opcion-titulo">&#128218; Investigar un CDT o cuenta de alto rendimiento</div>
+        <div class="plan-opcion-desc">El fondo de emergencia no tiene que estar en la peor cuenta. Busca una cuenta de ahorros que pague algo m&aacute;s que cero, sin perder liquidez.</div>
+        <div class="plan-opcion-tag">&#9201; 20 minutos</div>
+      </div>
+    </div>
+
+    <div class="accion-card" id="accion-confirmada">
+      <div class="accion-inner">
+        <div class="accion-emoji">&#10003;</div>
+        <div class="accion-titulo" id="accion-titulo-texto">Acci&oacute;n elegida</div>
+        <div class="accion-detalle" id="accion-detalle-texto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFLEXIÓN -->
+  <div class="card" id="reflexion-card" style="display:none;">
+    <div class="card-label">Tu reflexi&oacute;n del d&iacute;a</div>
+    <div class="card-title">&iquest;C&oacute;mo te sientes con este n&uacute;mero?</div>
+    <p class="card-body">Ver cu&aacute;nto necesitas y cu&aacute;nto te falta puede sentirse agobiante. O puede sentirse liberador. &iquest;Qu&eacute; te genera este ejercicio?</p>
+    <textarea class="reflection-area" id="reflection" placeholder="Ej: 'Me doy cuenta de que nunca hab&iacute;a separado el fondo de emergencia de mis ahorros...' / 'Me sorprend&iacute; al ver que estoy m&aacute;s cerca de lo que cre&iacute;a...'" oninput="guardarTexto()"></textarea>
+    <button class="btn-primary" id="save-btn" onclick="guardar()">&#10003; Completar el D&iacute;a 6 y ganar mi punto</button>
+  </div>
+
+  <!-- CELEBRACIÓN -->
+  <div class="celebracion" id="celebracion">
+    <div class="celebracion-emoji">&#128737;&#65039;&#10024;</div>
+    <div class="celebracion-title" id="cel-title">&#161;Ya sabes cu&aacute;nto necesitas!</div>
+    <div class="celebracion-sub">Seis d&iacute;as, seis n&uacute;meros que nunca ten&iacute;as. Ma&ntilde;ana los unimos todos en un plan que puedes guardar para siempre.</div>
+    <div class="wa-steps">
+      <div>
+        <div class="wa-step-label">Paso 1 &middot; Copia este mensaje</div>
+        <div class="msg-box" id="wa-msg">Hice el D&iacute;a 6 del Reto Feminversario &#128737;&#65039;
+
+Hoy calcul&eacute; mi fondo de emergencia ideal y eleg&iacute; un paso concreto para construirlo.
+
+Ya s&eacute; cu&aacute;nto necesito. Ahora s&eacute; c&oacute;mo llegar.
+
+Ma&ntilde;ana es el &uacute;ltimo d&iacute;a del reto &#128293;
+#RetoFeminversario</div>
+        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">&#128203; Copiar mensaje</button>
+      </div>
+      <div>
+        <div class="wa-step-label">Paso 2 &middot; &Aacute;brelo en el grupo</div>
+        <a class="btn-wa-grupo" href="https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN" target="_blank">&#128172; Abrir grupo del reto en WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-menta" id="manana-card" style="display:none;">
+    <div class="menta-label">Ma&ntilde;ana &middot; D&iacute;a 7 &middot; El &uacute;ltimo</div>
+    <div class="card-title" style="font-size:15px;">Tu plan financiero personal. Para siempre.</div>
+    <p class="card-body">Ma&ntilde;ana unimos todo lo que calculaste esta semana en un documento que puedes descargar, imprimir y guardar. Tu plan en tres horizontes: este mes, este a&ntilde;o, en 5 a&ntilde;os.</p>
+    <p class="card-body" style="margin-top:8px;color:#4a7a2a;font-weight:600;">No necesitas preparar nada. Ya lo tienes todo.</p>
+  </div>
+
+  <div class="footer">
+    <div class="day-nav">
+      <span class="nav-label">D&iacute;a 6</span>
+      <div class="dots">
+        <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
+        <div class="dot active"></div><div class="dot"></div>
+      </div>
+      <span class="nav-label">7 d&iacute;as</span>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:#c0bbd0;">Feminario &middot; Reto Feminversario &middot; Mayo 2026</p>
+  </div>
+</div>
+
+<script>
+function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+function fmt(n){return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
+function fmtC(n){if(n>=1e6)return '$\u00a0'+(n/1e6).toFixed(1)+'M';return fmt(n);}
+
+let mesesElegidos=6;
+let accionElegida=0;
+let gastosMes=0;
+
+/* ── PROGRESO ─────────────────────────────── */
+function actualizarProgreso(){
+  const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
+  const pts=dias.filter(d=>load(d)==='1').length;
+  document.getElementById('progress-fill').style.width=(pts/7*100)+'%';
+  document.getElementById('progress-pts').textContent=pts+'/7 \u2b50';
+  dias.forEach((d,i)=>{
+    const c=document.getElementById('chip'+(i+1));if(!c)return;
+    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='\u2713';}
+    else if(i===5&&load(d)!=='1'){c.classList.add('active');}
+  });
+}
+
+/* ── RESUMEN SEMANA ───────────────────────── */
+function mostrarResumen(){
+  const libertad=parseFloat(load('femi_d1_numero'))||0;
+  const salario=parseFloat(load('femi_d2_salario'))||parseFloat(load('femi_d3_salario'))||0;
+  const pension=parseFloat(load('femi_d4_pension'))||0;
+  const brecha=Math.max(libertad-pension,0);
+  if(!libertad&&!salario&&!pension) return;
+  document.getElementById('semana-resumen').style.display='grid';
+  if(libertad) document.getElementById('res-libertad').textContent=fmtC(libertad);
+  if(salario) document.getElementById('res-salario').textContent=fmtC(salario);
+  if(pension) document.getElementById('res-pension').textContent=fmtC(pension);
+  else document.getElementById('res-pension').textContent='\u2014';
+  if(libertad) document.getElementById('res-brecha').textContent=brecha>0?fmtC(brecha):'\u2705 Sin brecha';
+}
+
+/* ── GASTOS DÍA 2 ─────────────────────────── */
+function cargarGastosD2(){
+  const raw=load('femi_d2_gastos');
+  const salario=parseFloat(load('femi_d2_salario'))||0;
+  if(raw){
+    try{
+      const datos=JSON.parse(raw);
+      if(datos.length>0){
+        const total=datos.reduce((s,g)=>s+(g.v||0),0);
+        const box=document.getElementById('gastos-d2-box');
+        const lista=document.getElementById('gastos-d2-lista');
+        lista.innerHTML='';
+        datos.slice(0,6).forEach(g=>{
+          const div=document.createElement('div');
+          div.className='gasto-item';
+          div.innerHTML=`<span class="gasto-nombre">${g.n||'Gasto'}</span><span class="gasto-valor">${fmt(g.v)}</span>`;
+          lista.appendChild(div);
+        });
+        document.getElementById('gastos-d2-total').textContent=fmt(total);
+        box.style.display='block';
+        // Pre-fill input
+        const input=document.getElementById('gastos-mes');
+        input.value=total;
+        document.getElementById('gastos-hint').textContent='Pre-llenado con tus gastos del D\u00eda 2';
+        gastosMes=total;
+        calcularFondo();
+        return total;
+      }
+    }catch(e){}
+  }
+  // Si no hay gastos del D2 pero hay salario, sugerir
+  if(salario){
+    document.getElementById('gastos-hint').textContent='Sugerencia: entre el 70-80% de tu salario ('+fmt(salario*0.75)+' aprox)';
+  }
+  return 0;
+}
+
+/* ── SELECTOR MESES ───────────────────────── */
+function seleccionarMeses(n){
+  mesesElegidos=n;
+  save('femi_d6_meses',n);
+  [3,6,12].forEach(m=>{
+    const btn=document.getElementById('mes-'+m);
+    if(btn) btn.classList.toggle('selected',m===n);
+  });
+  calcularFondo();
+}
+
+/* ── CALCULADORA ──────────────────────────── */
+function calcularFondo(){
+  const gastos=parseFloat(document.getElementById('gastos-mes').value)||0;
+  gastosMes=gastos;
+  if(gastos<=0){
+    document.getElementById('fondo-result').classList.remove('visible');
+    return;
+  }
+  save('femi_d6_gastos',gastos);
+  const meta=gastos*mesesElegidos;
+  save('femi_d6_meta',meta);
+
+  document.getElementById('fondo-result').classList.add('visible');
+  document.getElementById('fondo-meta-num').textContent=fmt(meta);
+  document.getElementById('fondo-meta-sub').textContent=mesesElegidos+' meses de tus gastos reales';
+  document.getElementById('barra-meta-val').textContent=fmt(meta);
+  document.getElementById('diag-meta').textContent=fmt(meta);
+  document.getElementById('diag-meta-sub').textContent=mesesElegidos+' \u00d7 '+fmt(gastos)+' /mes';
+
+  actualizarProgreso6();
+  document.getElementById('accion-card').style.display='block';
+}
+
+function actualizarProgreso6(){
+  const meta=parseFloat(load('femi_d6_meta'))||gastosMes*mesesElegidos;
+  if(meta<=0) return;
+  const ahorro=parseFloat(document.getElementById('ahorro-actual').value)||0;
+  save('femi_d6_ahorro',ahorro);
+  const falta=Math.max(meta-ahorro,0);
+  const pct=Math.min(ahorro/meta*100,100);
+
+  // Barra
+  const fill=document.getElementById('barra-fill');
+  fill.style.width=pct+'%';
+  if(pct>=80) fill.style.background='linear-gradient(90deg,var(--verde),#7abf45)';
+  else if(pct>=40) fill.style.background='linear-gradient(90deg,var(--naranja),#e09020)';
+  else fill.style.background='linear-gradient(90deg,var(--rojo),#c03030)';
+  document.getElementById('barra-pct').textContent=Math.round(pct)+'%';
+  document.getElementById('barra-tienes-val').textContent=fmt(ahorro);
+
+  // Diagnóstico falta
+  document.getElementById('diag-falta').textContent=falta>0?fmt(falta):'\u2705 \u00a1Lista!';
+  document.getElementById('diag-falta-sub').textContent=falta>0?'para llegar a tu meta':'Superaste tu meta de fondo';
+
+  // Header estado
+  const header=document.getElementById('fondo-header');
+  const emoji=document.getElementById('fondo-emoji');
+  const titulo=document.getElementById('fondo-titulo');
+  header.className='fondo-header';
+  if(pct>=100){
+    header.classList.add('ok');emoji.textContent='\u2705';
+    titulo.textContent='\u00a1Tu fondo de emergencia est\u00e1 completo!';
+  } else if(pct>=50){
+    header.classList.add('cerca');emoji.textContent='\ud83d\udfe1';
+    titulo.textContent='Est\u00e1s en el camino \u2014 ya llevas el '+Math.round(pct)+'%';
+  } else {
+    header.classList.add('lejos');emoji.textContent='\ud83d\udea8';
+    titulo.textContent='Tu fondo de emergencia ideal';
+  }
+
+  // Plan de ahorro mensual
+  if(falta>0){
+    document.getElementById('plan-ahorro-box').style.display='block';
+    document.getElementById('ahorro-6m').textContent=fmt(Math.ceil(falta/6/10000)*10000);
+    document.getElementById('ahorro-12m').textContent=fmt(Math.ceil(falta/12/10000)*10000);
+    document.getElementById('ahorro-18m').textContent=fmt(Math.ceil(falta/18/10000)*10000);
+  } else {
+    document.getElementById('plan-ahorro-box').style.display='none';
+  }
+}
+
+/* ── ACCIÓN ───────────────────────────────── */
+const ACCIONES=[
+  null,
+  {titulo:'Abrir una cuenta separada para emergencias',detalle:'Hoy mismo en la app de tu banco. Una cuenta que no toques, que no ves en tu pantalla principal. El dinero que no ves, no lo gastas.'},
+  {titulo:'Configurar una transferencia autom\u00e1tica mensual',detalle:'Programa que cada vez que recibes tu pago, un porcentaje vaya directo al fondo. Lo que se ahorra solo, se ahorra de verdad.'},
+  {titulo:'Hacer mi primer dep\u00f3sito al fondo hoy',detalle:'El primer dep\u00f3sito convierte la intenci\u00f3n en acci\u00f3n. El monto no importa \u2014 importa el gesto.'},
+  {titulo:'Calcular d\u00f3nde recorto para ahorrar este mes',detalle:'Revisaste tus gastos en el D\u00eda 2. Ahora decides cu\u00e1l redirigir. No es eliminarlo \u2014 es moverlo a donde m\u00e1s te importa.'},
+  {titulo:'Investigar una cuenta de ahorro de alto rendimiento',detalle:'El fondo no tiene que estar en la peor cuenta. Un CDT de 30 d\u00edas o una cuenta de ahorro que pague algo m\u00e1s, sin perder liquidez.'},
+];
+
+function elegirAccion(n){
+  accionElegida=n;
+  save('femi_d6_accion',n);
+  document.querySelectorAll('.plan-opcion').forEach(el=>el.classList.remove('selected'));
+  const opcion=document.getElementById('acc-'+n);
+  if(opcion) opcion.classList.add('selected');
+  const a=ACCIONES[n];
+  document.getElementById('accion-titulo-texto').textContent=a.titulo;
+  document.getElementById('accion-detalle-texto').textContent=a.detalle;
+  document.getElementById('accion-confirmada').classList.add('visible');
+  document.getElementById('reflexion-card').style.display='block';
+  document.getElementById('manana-card').style.display='block';
+  document.getElementById('reflexion-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── GUARDAR ──────────────────────────────── */
+function guardarTexto(){save('femi_d6_reflexion',document.getElementById('reflection').value);}
+
+function copiarMensaje(){
+  const txt=document.getElementById('wa-msg').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{document.getElementById('copy-btn').textContent='\u2705 \u00a1Copiado! Ahora p\u00e9galo en el grupo';})
+  .catch(()=>{const r=document.createRange();r.selectNode(document.getElementById('wa-msg'));window.getSelection().removeAllRanges();window.getSelection().addRange(r);document.execCommand('copy');document.getElementById('copy-btn').textContent='\u2705 \u00a1Copiado!';});
+}
+
+function guardar(){
+  const btn=document.getElementById('save-btn');
+  if(!load('femi_d6_meta')){
+    btn.textContent='Primero calcula tu fondo de emergencia \u2191';
+    btn.style.background='#b07040';
+    setTimeout(()=>{btn.textContent='\u2713 Completar el D\u00eda 6 y ganar mi punto';btn.style.background='';},2200);
+    return;
+  }
+  if(!load('femi_d6_accion')){
+    btn.textContent='Primero elige tu acci\u00f3n de hoy \u2191';
+    btn.style.background='#b07040';
+    setTimeout(()=>{btn.textContent='\u2713 Completar el D\u00eda 6 y ganar mi punto';btn.style.background='';},2200);
+    return;
+  }
+  save('femi_d6_listo','1');
+  save('femi_d6_reflexion_texto',document.getElementById('reflection').value);
+  btn.textContent='\u2713 \u00a1D\u00eda 6 completado! +1 punto';
+  btn.classList.add('saved');
+  actualizarProgreso();
+  const nombre=load('femi_nombre')||'';
+  document.getElementById('cel-title').textContent='\u00a1Ya tienes tu red de seguridad'+(nombre?', '+nombre:'')+' !';
+  const cel=document.getElementById('celebracion');
+  cel.classList.add('visible');
+  cel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ── LOAD ─────────────────────────────────── */
+window.addEventListener('load',()=>{
+  actualizarProgreso();
+  mostrarResumen();
+
+  // Restaurar meses elegidos
+  const mesesG=parseInt(load('femi_d6_meses'))||6;
+  mesesElegidos=mesesG;
+  [3,6,12].forEach(m=>{
+    const btn=document.getElementById('mes-'+m);
+    if(btn) btn.classList.toggle('selected',m===mesesG);
+  });
+
+  // Cargar gastos del día 2 (o restaurar si ya ingresó manualmente)
+  const gastosG=load('femi_d6_gastos');
+  if(gastosG){
+    document.getElementById('gastos-mes').value=gastosG;
+    document.getElementById('gastos-hint').textContent='Datos guardados';
+    gastosMes=parseFloat(gastosG);
+    // Aun así mostrar los gastos del D2 si existen
+    cargarGastosD2();
+    calcularFondo();
+  } else {
+    cargarGastosD2();
+  }
+
+  // Restaurar ahorro actual
+  const ahorroG=load('femi_d6_ahorro');
+  if(ahorroG) document.getElementById('ahorro-actual').value=ahorroG;
+
+  // Restaurar acción elegida
+  const accionG=parseInt(load('femi_d6_accion'))||0;
+  if(accionG){
+    accionElegida=accionG;
+    const opcion=document.getElementById('acc-'+accionG);
+    if(opcion) opcion.classList.add('selected');
+    const a=ACCIONES[accionG];
+    if(a){
+      document.getElementById('accion-titulo-texto').textContent=a.titulo;
+      document.getElementById('accion-detalle-texto').textContent=a.detalle;
+      document.getElementById('accion-confirmada').classList.add('visible');
+    }
+    document.getElementById('reflexion-card').style.display='block';
+    document.getElementById('manana-card').style.display='block';
+  }
+
+  // Restaurar reflexión
+  const r=load('femi_d6_reflexion');
+  if(r) document.getElementById('reflection').value=r;
+
+  // Si ya completó
+  if(load('femi_d6_listo')==='1'){
+    const btn=document.getElementById('save-btn');
+    btn.textContent='\u2713 \u00a1D\u00eda 6 completado! +1 punto';
+    btn.classList.add('saved');
+    const nombre=load('femi_nombre')||'';
+    document.getElementById('cel-title').textContent='\u00a1Ya tienes tu red de seguridad'+(nombre?', '+nombre:'')+' !';
+    document.getElementById('celebracion').classList.add('visible');
+  }
+});
+</script>
+</body>
+</html>
