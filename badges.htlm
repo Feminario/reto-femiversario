@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --azul:#7E84AE;--azul-l:#C2CBFF;--lila:#CEA2DD;--menta:#DFF3AF;
+  --naranja:#F59356;--crema:#FFEAD2;--crema-l:#FFF7EF;
+  --lila-l:#F9E1FF;--dorado:#F7C175;
+  --texto:#2B2040;--muted:#6B6080;--border:rgba(126,132,174,0.2);
+}
+body{background:var(--crema-l);font-family:'Montserrat',sans-serif;color:var(--texto);padding-bottom:40px;}
+
+.header{background:var(--azul);padding:20px 24px 24px;text-align:center;}
+.header h1{font-size:18px;font-weight:700;color:white;margin-bottom:4px;}
+.header p{font-size:12px;color:rgba(255,255,255,.75);}
+
+.content{max-width:480px;margin:0 auto;padding:20px 16px 0;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(126,132,174,.06);}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul);margin-bottom:8px;}
+.card-title{font-size:14px;font-weight:700;color:var(--texto);margin-bottom:10px;}
+
+/* INPUT NOMBRE */
+.nombre-input{width:100%;background:var(--crema-l);border:2px solid var(--azul-l);border-radius:10px;padding:10px 14px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;color:var(--texto);transition:border-color .15s;}
+.nombre-input:focus{outline:none;border-color:var(--azul);background:white;}
+.nombre-input::placeholder{color:#c0bbd0;font-weight:400;}
+
+/* SELECTOR DE BADGE */
+.badge-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.badge-option{border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center;cursor:pointer;transition:all .2s;}
+.badge-option:hover{border-color:var(--azul);}
+.badge-option.selected{border-color:var(--naranja);background:rgba(245,147,86,.06);}
+.badge-option-icon{font-size:20px;margin-bottom:4px;}
+.badge-option-name{font-size:11px;font-weight:700;color:var(--texto);}
+
+/* CANVAS */
+.canvas-wrap{display:flex;justify-content:center;margin:14px 0;}
+canvas{border-radius:12px;max-width:100%;box-shadow:0 4px 20px rgba(126,132,174,.2);}
+
+/* BOTONES */
+.btn-primary{display:block;width:100%;padding:13px;background:var(--naranja);border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;}
+.btn-primary:hover{background:#e07d3d;}
+.btn-secondary{display:block;width:100%;padding:11px;background:white;border:2px solid var(--azul);border-radius:12px;color:var(--azul);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s;}
+.btn-secondary:hover{background:var(--azul-l);}
+
+.share-hint{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Badges del Reto Feminversario 🎂</h1>
+  <p>Descarga el tuyo, publícalo en tus stories y etiqueta a @feminario</p>
+</div>
+
+<div class="content">
+
+  <div class="card">
+    <div class="card-label">Tu nombre en el badge</div>
+    <input class="nombre-input" id="nombre" type="text" placeholder="Escribe tu nombre..." oninput="dibujar()" maxlength="28">
+  </div>
+
+  <div class="card">
+    <div class="card-label">Elige tu badge</div>
+    <div class="badge-grid">
+      <div class="badge-option selected" id="b0" onclick="elegir(0)">
+        <div class="badge-option-icon">🎂</div>
+        <div class="badge-option-name">Completé el reto</div>
+      </div>
+      <div class="badge-option" id="b1" onclick="elegir(1)">
+        <div class="badge-option-icon">⚡</div>
+        <div class="badge-option-name">Hice mi primera inversión</div>
+      </div>
+      <div class="badge-option" id="b2" onclick="elegir(2)">
+        <div class="badge-option-icon">🧭</div>
+        <div class="badge-option-name">Conocí mi número de la libertad</div>
+      </div>
+      <div class="badge-option" id="b3" onclick="elegir(3)">
+        <div class="badge-option-icon">💼</div>
+        <div class="badge-option-name">Calculé mi valor económico</div>
+      </div>
+      <div class="badge-option" id="b4" onclick="elegir(4)">
+        <div class="badge-option-icon">📊</div>
+        <div class="badge-option-name">Vi el hueco de mi pensión</div>
+      </div>
+      <div class="badge-option" id="b5" onclick="elegir(5)">
+        <div class="badge-option-icon">🛡️</div>
+        <div class="badge-option-name">Armé mi red de seguridad</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="badge" width="540" height="540"></canvas>
+  </div>
+
+  <button class="btn-primary" onclick="descargar()">⬇️ Descargar mi badge</button>
+  <button class="btn-secondary" onclick="dibujar()">🔄 Actualizar preview</button>
+  <p class="share-hint">Formato cuadrado — perfecto para Instagram y WhatsApp.<br>Publícalo con <strong>#RetoFeminversario</strong> y etiqueta a <strong>@feminario</strong></p>
+</div>
+
+<script>
+const BADGES = [
+  {emoji:'🎂', titulo:'COMPLETÉ EL', sub:'RETO FEMINVERSARIO', color1:'#7E84AE', color2:'#CEA2DD', accent:'#F7C175'},
+  {emoji:'⚡', titulo:'HICE MI PRIMERA', sub:'INVERSIÓN REAL', color1:'#2d2060', color2:'#7E84AE', accent:'#F59356'},
+  {emoji:'🧭', titulo:'CONOCÍ MI NÚMERO', sub:'DE LA LIBERTAD', color1:'#4a5280', color2:'#9B7DBF', accent:'#DFF3AF'},
+  {emoji:'💼', titulo:'CALCULÉ MI VALOR', sub:'ECONÓMICO', color1:'#5a3080', color2:'#7E84AE', accent:'#F7C175'},
+  {emoji:'📊', titulo:'VI EL HUECO DE', sub:'MI PENSIÓN', color1:'#3a2a5a', color2:'#5a3080', accent:'#F59356'},
+  {emoji:'🛡️', titulo:'ARMÉ MI RED', sub:'DE SEGURIDAD', color1:'#2d5a40', color2:'#4a7a2a', accent:'#DFF3AF'},
+];
+
+let badgeIdx = 0;
+
+function elegir(i){
+  document.querySelectorAll('.badge-option').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('b'+i).classList.add('selected');
+  badgeIdx = i;
+  dibujar();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+  for(let w of words){
+    const test = line + (line?'  ':'')+w;
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line); line = w;
+    } else { line = test; }
+  }
+  lines.push(line);
+  lines.forEach((l,i)=> ctx.fillText(l, x, y + i*lineHeight));
+  return lines.length;
+}
+
+function dibujar(){
+  const canvas = document.getElementById('badge');
+  const ctx = canvas.getContext('2d');
+  const W = 540, H = 540;
+  const b = BADGES[badgeIdx];
+  const nombre = document.getElementById('nombre').value || 'TU NOMBRE';
+
+  // FONDO DEGRADADO
+  const grad = ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0, b.color1);
+  grad.addColorStop(1, b.color2);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+
+  // PATRÓN PUNTOS SUTILES
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  for(let x=0;x<W;x+=30){
+    for(let y=0;y<H;y+=30){
+      ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // MARCO INTERIOR
+  ctx.strokeStyle='rgba(255,255,255,0.15)';
+  ctx.lineWidth=2;
+  roundRect(ctx,24,24,W-48,H-48,20);
+  ctx.stroke();
+
+  // ACENTO SUPERIOR
+  ctx.fillStyle=b.accent;
+  ctx.fillRect(W/2-40,32,80,4);
+
+  // EMOJI GRANDE
+  ctx.font='bold 88px serif';
+  ctx.textAlign='center';
+  ctx.fillStyle='white';
+  ctx.fillText(b.emoji, W/2, 180);
+
+  // FEMINARIO — marca pequeña
+  ctx.font='700 11px Montserrat, sans-serif';
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.letterSpacing='0.2em';
+  ctx.fillText('F E M I N A R I O', W/2, 230);
+
+  // TÍTULO BADGE
+  ctx.font='800 34px Montserrat, sans-serif';
+  ctx.fillStyle='white';
+  ctx.shadowColor='rgba(0,0,0,.3)';
+  ctx.shadowBlur=8;
+  ctx.fillText(b.titulo, W/2, 285);
+
+  // SUBTÍTULO BADGE
+  ctx.font='700 28px Montserrat, sans-serif';
+  ctx.fillStyle=b.accent;
+  ctx.fillText(b.sub, W/2, 325);
+  ctx.shadowBlur=0;
+
+  // SEPARADOR
+  ctx.strokeStyle='rgba(255,255,255,0.2)';
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(80,360);ctx.lineTo(W-80,360);ctx.stroke();
+
+  // NOMBRE
+  ctx.font='700 26px Montserrat, sans-serif';
+  ctx.fillStyle='rgba(255,255,255,0.95)';
+  const maxW=W-120;
+  if(ctx.measureText(nombre.toUpperCase()).width>maxW){
+    ctx.font='700 20px Montserrat, sans-serif';
+  }
+  ctx.fillText(nombre.toUpperCase(), W/2, 408);
+
+  // FECHA
+  ctx.font='500 13px Montserrat, sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.55)';
+  ctx.fillText('Reto Feminversario · Mayo 2026', W/2, 440);
+
+  // HASHTAG
+  ctx.font='600 14px Montserrat, sans-serif';
+  ctx.fillStyle=b.accent;
+  ctx.fillText('#RetoFeminversario', W/2, 475);
+
+  // ACENTO INFERIOR
+  ctx.fillStyle=b.accent;
+  ctx.fillRect(W/2-40,H-36,80,4);
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+function descargar(){
+  const nombre = document.getElementById('nombre').value||'feminversario';
+  const link = document.createElement('a');
+  link.download = 'badge-feminversario-'+nombre.toLowerCase().replace(/\s+/g,'-')+'.png';
+  link.href = document.getElementById('badge').toDataURL('image/png');
+  link.click();
+}
+
+// Dibujar al cargar
+window.addEventListener('load', dibujar);
+</script>
+</body>
+</html>
