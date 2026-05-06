@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --azul:#7E84AE; --azul-l:#C2CBFF; --lila:#CEA2DD; --menta:#DFF3AF;
+  --naranja:#F59356; --crema:#FFEAD2; --crema-l:#FFF7EF;
+  --lila-l:#F9E1FF; --dorado:#F7C175;
+  --texto:#2B2040; --muted:#6B6080; --border:rgba(126,132,174,0.2);
+}
+body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',sans-serif; min-height:100vh; padding-bottom:48px; }
+
+.progress-bar-wrap { position:sticky; top:0; z-index:100; background:white; border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:10px; box-shadow:0 2px 12px rgba(126,132,174,.08); }
+.progress-label { font-size:11px; font-weight:700; color:var(--azul); white-space:nowrap; }
+.progress-track { flex:1; height:8px; background:var(--crema); border-radius:8px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:8px; background:linear-gradient(90deg,var(--azul) 0%,var(--lila) 100%); transition:width .6s cubic-bezier(.4,0,.2,1); }
+.progress-pts { font-size:12px; font-weight:700; color:var(--azul); white-space:nowrap; min-width:36px; text-align:right; }
+
+.day-chips { display:flex; gap:4px; padding:0 16px 8px; background:white; overflow-x:auto; justify-content:center; border-bottom:1px solid var(--border); }
+.chip { width:30px; height:30px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--muted); flex-shrink:0; transition:all .3s; }
+.chip.done { background:var(--azul); border-color:var(--azul); color:white; }
+.chip.active { border-color:var(--naranja); color:var(--naranja); }
+
+.header { background:linear-gradient(135deg, #5a6090 0%, var(--azul) 100%); padding:20px 24px 28px; text-align:center; position:relative; overflow:hidden; }
+.header::after { content:''; position:absolute; bottom:-1px; left:0; right:0; height:20px; background:var(--crema-l); border-radius:20px 20px 0 0; }
+.logo-text { font-size:20px; font-weight:700; color:white; letter-spacing:.04em; }
+.logo-sub { font-size:10px; color:rgba(255,255,255,.65); letter-spacing:.05em; margin-top:2px; margin-bottom:14px; }
+.header-pill { display:inline-block; background:rgba(255,255,255,.2); border-radius:20px; padding:4px 12px; font-size:10px; color:white; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+.header-title { font-size:clamp(20px,5vw,30px); font-weight:700; color:white; line-height:1.2; margin-bottom:6px; }
+.header-title em { font-style:italic; font-weight:400; color:var(--dorado); }
+.header-sub-text { font-size:12px; color:rgba(255,255,255,.8); }
+
+.content { max-width:600px; margin:0 auto; padding:20px 16px 0; }
+.card { background:white; border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:14px; box-shadow:0 2px 12px rgba(126,132,174,.06); }
+.card-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--azul); margin-bottom:6px; }
+.card-title { font-size:16px; font-weight:700; color:var(--texto); margin-bottom:10px; line-height:1.3; }
+.card-body { font-size:13px; color:var(--muted); line-height:1.8; }
+.card-body strong { color:var(--texto); font-weight:600; }
+.callout { background:var(--lila-l); border-left:3px solid var(--lila); border-radius:0 10px 10px 0; padding:14px 16px; margin-top:14px; font-size:13px; color:var(--texto); line-height:1.7; font-weight:500; }
+
+/* INPUTS */
+.input-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+@media(max-width:400px){.input-row{grid-template-columns:1fr;}}
+.input-group { display:flex; flex-direction:column; gap:5px; }
+.input-label { font-size:11px; color:var(--muted); font-weight:600; }
+.calc-input { background:var(--crema-l); border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--texto); font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; width:100%; transition:border-color .15s; -moz-appearance:textfield; }
+.calc-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.calc-input:focus{outline:none;border-color:var(--azul);background:white;}
+.calc-input::placeholder{color:#c0bbd0;font-weight:400;}
+
+/* RESULTADO HORA */
+.hora-result {
+  margin-top:16px;
+  background:linear-gradient(135deg, var(--azul) 0%, #5a6090 100%);
+  border-radius:16px;
+  padding:20px;
+  text-align:center;
+  color:white;
+  display:none;
+}
+.hora-result.visible { display:block; animation:pop .4s cubic-bezier(.4,0,.2,1); }
+.hora-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.7); margin-bottom:6px; }
+.hora-valor { font-size:42px; font-weight:700; line-height:1; margin-bottom:4px; color:var(--dorado); }
+.hora-desc { font-size:12px; color:rgba(255,255,255,.8); }
+
+/* CONVERSOR DE GASTOS */
+.conversor { margin-top:16px; }
+.conversor-title { font-size:13px; font-weight:700; color:var(--texto); margin-bottom:12px; }
+.gasto-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.gasto-input { flex:1; min-width:120px; background:var(--crema-l); border:1.5px solid var(--border); border-radius:10px; padding:9px 12px; color:var(--texto); font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; -moz-appearance:textfield; }
+.gasto-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.gasto-input:focus{outline:none;border-color:var(--azul);background:white;}
+.gasto-nombre { flex:1.5; min-width:100px; background:var(--crema-l); border:1.5px solid var(--border); border-radius:10px; padding:9px 12px; color:var(--texto); font-family:'Montserrat',sans-serif; font-size:13px; }
+.gasto-nombre:focus{outline:none;border-color:var(--azul);background:white;}
+.gasto-result { font-size:12px; font-weight:700; color:var(--azul); white-space:nowrap; min-width:80px; text-align:right; }
+
+.conversor-hint { font-size:11px; color:var(--muted); margin-top:6px; text-align:center; font-style:italic; }
+
+/* INSIGHT */
+.insight-box {
+  margin-top:16px;
+  background:var(--crema);
+  border:1.5px solid var(--dorado);
+  border-radius:14px;
+  padding:16px;
+  display:none;
+}
+.insight-box.visible { display:block; }
+.insight-emoji { font-size:24px; margin-bottom:6px; }
+.insight-text { font-size:13px; color:var(--texto); line-height:1.7; }
+
+/* REFLECTION */
+.reflection-area { width:100%; background:var(--crema-l); border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--texto); font-family:'Montserrat',sans-serif; font-size:13px; line-height:1.7; resize:vertical; min-height:80px; margin-top:12px; transition:border-color .15s; }
+.reflection-area:focus{outline:none;border-color:var(--azul);background:white;}
+.reflection-area::placeholder{color:#c0bbd0;}
+
+/* BUTTONS */
+.btn-primary { display:block; width:100%; margin-top:12px; padding:14px; background:var(--naranja); border:none; border-radius:12px; color:white; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:background .15s, transform .1s; }
+.btn-primary:hover{background:#e07d3d;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary.saved{background:#4a9e6e;}
+
+/* CELEBRACIÓN */
+.celebracion { display:none; margin-top:14px; background:linear-gradient(135deg,var(--menta) 0%,var(--crema) 100%); border:2px solid #7abf45; border-radius:16px; padding:20px; }
+.celebracion.visible { display:block; animation:pop .4s cubic-bezier(.4,0,.2,1); }
+@keyframes pop{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+.celebracion-emoji { font-size:36px; margin-bottom:8px; text-align:center; }
+.celebracion-title { font-size:16px; font-weight:700; color:#2d5a1a; margin-bottom:6px; text-align:center; }
+.celebracion-sub { font-size:12px; color:#4a7a2a; line-height:1.7; margin-bottom:16px; text-align:center; }
+.wa-steps { display:flex; flex-direction:column; gap:10px; }
+.wa-step-label { font-size:10px; font-weight:700; color:#4a7a2a; text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; }
+.msg-box { background:white; border:1px solid #7abf45; border-radius:10px; padding:12px 14px; font-size:12px; color:var(--texto); line-height:1.7; white-space:pre-line; }
+.btn-copy { display:block; width:100%; margin-top:8px; padding:10px; background:white; border:2px solid #7abf45; border-radius:10px; color:#2d5a1a; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:background .15s; }
+.btn-copy:hover{background:var(--menta);}
+.btn-wa-grupo { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; background:#25D366; border:none; border-radius:12px; color:white; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; cursor:pointer; text-decoration:none; transition:background .15s; }
+.btn-wa-grupo:hover{background:#1db954;}
+
+/* MAÑANA */
+.card-menta { background:white; border:1.5px solid var(--menta); border-radius:16px; padding:18px 20px; margin-bottom:14px; }
+.menta-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#4a7a2a; margin-bottom:6px; }
+.footer { text-align:center; padding:16px 0 0; border-top:1px solid var(--border); margin-top:6px; }
+.day-nav { display:flex; justify-content:space-between; align-items:center; }
+.dots { display:flex; gap:5px; align-items:center; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--border); }
+.dot.active { background:var(--azul); width:20px; border-radius:3px; }
+.dot.done { background:var(--azul); }
+.nav-label { font-size:11px; color:var(--muted); font-weight:500; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap">
+  <span class="progress-label">Tu progreso</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <span class="progress-pts" id="progress-pts">0/7 ⭐</span>
+</div>
+<div class="day-chips">
+  <div class="chip done" id="chip1">✓</div>
+  <div class="chip active" id="chip2">2</div>
+  <div class="chip" id="chip3">3</div><div class="chip" id="chip4">4</div>
+  <div class="chip" id="chip5">5</div><div class="chip" id="chip6">6</div>
+  <div class="chip" id="chip7">7</div>
+</div>
+
+<div class="header">
+  <div class="logo-text">feminario</div>
+  <div class="logo-sub">el espacio seguro donde las mujeres redefinimos la autonomía económica</div>
+  <div class="header-pill">Reto Feminversario · Día 2 de 7 · 11 de mayo</div>
+  <h1 class="header-title">¿Cuánto vale tu <em>hora de vida</em>?</h1>
+  <p class="header-sub-text">El cálculo que nadie te enseñó. Hoy lo haces.</p>
+</div>
+
+<div class="content">
+
+  <!-- INTRO -->
+  <div class="card">
+    <div class="card-label">El concepto</div>
+    <div class="card-title">No gastas dinero. Gastas tiempo de tu vida.</div>
+    <p class="card-body">
+      Cuando compras algo, no lo pagas en pesos. Lo pagas en horas de tu vida que tuviste que trabajar para ganar esos pesos.<br><br>
+      Ese café de $8.000 — ¿cuántos minutos de tu vida costó? ¿Y esa suscripción que olvidaste cancelar?<br><br>
+      Cuando lo ves así, <strong>cada decisión financiera se vuelve concreta</strong>. No es teoría. Es tu tiempo.
+    </p>
+    <div class="callout">
+      Hoy calculas el precio real de tu hora. Después conviertes tus gastos más comunes a horas de vida. Lo que ves puede sorprenderte.
+    </div>
+  </div>
+
+  <!-- PASO 1: CALCULAR LA HORA -->
+  <div class="card">
+    <div class="card-label">Paso 1 · Tu hora de vida</div>
+    <div class="card-title">¿Cuánto vale una hora de tu trabajo?</div>
+    <p class="card-body">Ingresa tu salario mensual neto (lo que te llega a la cuenta) y las horas que trabajas al mes.</p>
+
+    <div class="input-row">
+      <div class="input-group">
+        <label class="input-label">💰 Salario mensual neto</label>
+        <input class="calc-input" type="number" id="salario" placeholder="$ 0" oninput="calcularHora()">
+      </div>
+      <div class="input-group">
+        <label class="input-label">⏱ Horas trabajadas al mes</label>
+        <input class="calc-input" type="number" id="horas" placeholder="ej. 176" oninput="calcularHora()">
+        <span style="font-size:10px;color:var(--muted);">8h/día × 22 días = 176h</span>
+      </div>
+    </div>
+
+    <div class="hora-result" id="hora-result">
+      <div class="hora-label">Tu hora de vida vale</div>
+      <div class="hora-valor" id="hora-valor">$0</div>
+      <div class="hora-desc" id="hora-desc">por hora trabajada</div>
+    </div>
+  </div>
+
+  <!-- PASO 2: CONVERSOR -->
+  <div class="card" id="conversor-card" style="display:none;">
+    <div class="card-label">Paso 2 · Conversor de gastos</div>
+    <div class="card-title">¿Cuántas horas de vida te cuestan tus gastos?</div>
+    <p class="card-body" style="margin-bottom:4px;">Ingresa el nombre y el valor de cada gasto. Te convertimos automáticamente a horas de tu vida.</p>
+
+    <div class="conversor" id="conversor">
+      <div class="conversor-title" style="margin-top:12px;">Nombre del gasto → Valor → Tu tiempo</div>
+    </div>
+    <div class="conversor-hint">Prueba con: el arriendo, el café diario, streaming, ropa, salidas...</div>
+
+    <div class="insight-box" id="insight-box">
+      <div class="insight-emoji">💡</div>
+      <div class="insight-text" id="insight-text"></div>
+    </div>
+  </div>
+
+  <!-- REFLEXIÓN -->
+  <div class="card" id="reflexion-card" style="display:none;">
+    <div class="card-label">Tu reflexión del día</div>
+    <div class="card-title">¿Qué gasto te sorprendió más?</div>
+    <p class="card-body">Cuando lo ves en horas de vida en lugar de pesos, ¿qué se siente diferente? ¿Hay algo que valga más de lo que creías o menos?</p>
+    <textarea class="reflection-area" id="reflection" placeholder="Escribe acá tu respuesta — nadie más la ve." oninput="guardarTexto()"></textarea>
+    <button class="btn-primary" id="save-btn" onclick="guardar()">✓ Completar el Día 2 y ganar mi punto</button>
+  </div>
+
+  <!-- CELEBRACIÓN -->
+  <div class="celebracion" id="celebracion">
+    <div class="celebracion-emoji">🕐</div>
+    <div class="celebracion-title" id="cel-title">¡Ya sabes cuánto vale tu tiempo!</div>
+    <div class="celebracion-sub">Este número cambia cómo ves cada compra. Compártelo con la comunidad — que todas hagan el cálculo hoy.</div>
+    <div class="wa-steps">
+      <div>
+        <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
+        <div class="msg-box" id="wa-msg">Hice el Día 2 del Reto Feminversario 🕐
+
+Calculé cuánto vale mi hora de vida y ahora veo mis gastos completamente diferente.
+
+¿Ya hiciste el tuyo? 
+#RetoFeminversario</div>
+        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
+      </div>
+      <div>
+        <div class="wa-step-label">Paso 2 · Ábrelo en el grupo</div>
+        <a class="btn-wa-grupo" href="https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN" target="_blank">💬 Abrir grupo del reto en WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAÑANA -->
+  <div class="card-menta" id="manana-card" style="display:none;">
+    <div class="menta-label">Mañana · Día 3</div>
+    <div class="card-title" style="font-size:15px;">¿Cuánto vales como activo económico?</div>
+    <p class="card-body">El día 3 vas a calcular algo que nadie te ha dicho nunca: el total que vas a generar con tu trabajo en toda tu vida. El número suele ser mucho más grande de lo que crees.</p>
+    <p class="card-body" style="margin-top:8px;color:#4a7a2a;font-weight:600;">No necesitas preparar nada. Todo lo necesitas ya lo tienes.</p>
+  </div>
+
+  <div class="footer">
+    <div class="day-nav">
+      <span class="nav-label">Día 2</span>
+      <div class="dots">
+        <div class="dot done"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <span class="nav-label">7 días</span>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:#c0bbd0;">Feminario · Reto Feminversario · Mayo 2026</p>
+  </div>
+</div>
+
+<script>
+const WA_GRUPO = 'https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN';
+function fmt(n){ return '$\u00a0'+Math.round(n).toLocaleString('es-CO'); }
+function fmtH(h){
+  if(h < 0.017) return Math.round(h*60)+' seg';
+  if(h < 1) return Math.round(h*60)+' min';
+  if(h < 24) return h.toFixed(1).replace('.',',')+' h';
+  return (h/24).toFixed(1).replace('.',',')+' días';
+}
+function save(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
+function load(k){ try{return localStorage.getItem(k)||'';}catch(e){return '';} }
+
+let valorHora = 0;
+
+function actualizarProgreso(){
+  const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
+  const pts=dias.filter(d=>load(d)==='1').length;
+  document.getElementById('progress-fill').style.width=(pts/7*100)+'%';
+  document.getElementById('progress-pts').textContent=pts+'/7 ⭐';
+  dias.forEach((d,i)=>{
+    const c=document.getElementById('chip'+(i+1));
+    if(!c) return;
+    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='✓';}
+    else if(i===1 && load(d)!=='1'){c.classList.add('active');}
+  });
+}
+
+function calcularHora(){
+  const sal = parseFloat(document.getElementById('salario').value)||0;
+  const hrs = parseFloat(document.getElementById('horas').value)||0;
+  const res = document.getElementById('hora-result');
+  if(sal>0 && hrs>0){
+    valorHora = sal/hrs;
+    document.getElementById('hora-valor').textContent = fmt(valorHora);
+    document.getElementById('hora-desc').textContent = 'por hora · tu tiempo tiene ese valor';
+    res.classList.add('visible');
+    save('femi_d2_hora', valorHora);
+    save('femi_d2_salario', sal);
+    save('femi_d2_horas_mes', hrs);
+    // Mostrar conversor y reflexión
+    document.getElementById('conversor-card').style.display='block';
+    document.getElementById('reflexion-card').style.display='block';
+    document.getElementById('manana-card').style.display='block';
+    actualizarConversor();
+    actualizarInsight(sal, hrs, valorHora);
+  } else {
+    res.classList.remove('visible');
+    valorHora=0;
+  }
+}
+
+const GASTOS_EJEMPLO = [
+  {nombre:'Café diario (mensual)', valor:240000},
+  {nombre:'Netflix', valor:20900},
+  {nombre:'Almuerzo fuera', valor:180000},
+];
+
+function crearFilaGasto(nombre='', valor=''){
+  const div = document.createElement('div');
+  div.className = 'gasto-row';
+  div.innerHTML = `
+    <input class="gasto-nombre" type="text" placeholder="Nombre del gasto" value="${nombre}" oninput="actualizarConversor()">
+    <input class="gasto-input" type="number" placeholder="$ valor" value="${valor}" oninput="actualizarConversor()" style="-moz-appearance:textfield;">
+    <span class="gasto-result" style="color:var(--muted);">—</span>
+  `;
+  div.querySelector('.gasto-input').addEventListener('focus', function(){this.select();});
+  return div;
+}
+
+function inicializarConversor(){
+  const c = document.getElementById('conversor');
+  c.innerHTML = '<div class="conversor-title" style="margin-top:12px;">Nombre → Valor → Horas de tu vida</div>';
+  GASTOS_EJEMPLO.forEach(g => c.appendChild(crearFilaGasto(g.nombre, g.valor)));
+  // Filas vacías
+  for(let i=0;i<3;i++) c.appendChild(crearFilaGasto());
+}
+
+function actualizarConversor(){
+  if(valorHora===0) return;
+  const filas = document.querySelectorAll('.gasto-row');
+  const datos = [];
+  filas.forEach(fila=>{
+    const v = parseFloat(fila.querySelector('.gasto-input').value)||0;
+    const n = fila.querySelector('.gasto-nombre').value||'';
+    const res = fila.querySelector('.gasto-result');
+    if(v>0){
+      const h = v/valorHora;
+      res.textContent = fmtH(h);
+      res.style.color = h>8?'#c0392b': h>4?'var(--naranja)':'var(--azul)';
+      if(n) datos.push({n,v,h});
+    } else {
+      res.textContent='—'; res.style.color='var(--muted)';
+    }
+  });
+  save('femi_d2_gastos', JSON.stringify(datos));
+}
+
+function actualizarInsight(sal, hrs, vh){
+  const ib = document.getElementById('insight-box');
+  const it = document.getElementById('insight-text');
+  const minLibres = 480 - hrs; // min en 30 días (aprox)
+  const gastoD1 = parseFloat(load('femi_d1_numero'))||0;
+  let texto = '';
+  if(gastoD1>0){
+    const mesesLib = gastoD1/sal;
+    texto = `Con tu salario actual, necesitas trabajar <strong>${(mesesLib*hrs).toFixed(0)} horas</strong> para cubrir un mes completo de tu número de la libertad ($${Math.round(gastoD1).toLocaleString('es-CO')}). `;
+  }
+  texto += `Tu hora vale <strong>${fmt(vh)}</strong>. Cada vez que decides cómo usar tu tiempo, estás decidiendo cómo usar ese valor.`;
+  it.innerHTML = texto;
+  ib.classList.add('visible');
+}
+
+function guardarTexto(){ save('femi_d2_reflexion', document.getElementById('reflection').value); }
+
+function copiarMensaje(){
+  const txt=document.getElementById('wa-msg').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const b=document.getElementById('copy-btn');
+    b.textContent='✅ ¡Copiado! Ahora pégalo en el grupo';
+  }).catch(()=>{
+    const r=document.createRange();r.selectNode(document.getElementById('wa-msg'));
+    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+    document.execCommand('copy');
+    document.getElementById('copy-btn').textContent='✅ ¡Copiado!';
+  });
+}
+
+function guardar(){
+  const btn=document.getElementById('save-btn');
+  if(valorHora===0){
+    btn.textContent='Primero calcula tu hora arriba ↑';
+    btn.style.background='#b07040';
+    setTimeout(()=>{btn.textContent='✓ Completar el Día 2 y ganar mi punto';btn.style.background='';},2200);
+    return;
+  }
+  save('femi_d2_listo','1');
+  btn.textContent='✓ ¡Día 2 completado! +1 punto';
+  btn.classList.add('saved');
+  actualizarProgreso();
+  const nombre=load('femi_nombre')||'';
+  document.getElementById('cel-title').textContent='¡Ya sabes cuánto vale tu tiempo'+(nombre?', '+nombre:'')+'!';
+  const cel=document.getElementById('celebracion');
+  cel.classList.add('visible');
+  cel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+window.addEventListener('load',()=>{
+  actualizarProgreso();
+  inicializarConversor();
+
+  // Restaurar
+  const vh=parseFloat(load('femi_d2_hora'))||0;
+  const sal=parseFloat(load('femi_d2_salario'))||0;
+  const hrs=parseFloat(load('femi_d2_horas_mes'))||0;
+  if(sal){ document.getElementById('salario').value=sal; }
+  if(hrs){ document.getElementById('horas').value=hrs; }
+  const r=load('femi_d2_reflexion');
+  if(r) document.getElementById('reflection').value=r;
+
+  if(vh>0){
+    valorHora=vh;
+    document.getElementById('hora-valor').textContent=fmt(vh);
+    document.getElementById('hora-result').classList.add('visible');
+    document.getElementById('conversor-card').style.display='block';
+    document.getElementById('reflexion-card').style.display='block';
+    document.getElementById('manana-card').style.display='block';
+    actualizarConversor();
+    actualizarInsight(sal,hrs,vh);
+  }
+
+  if(load('femi_d2_listo')==='1'){
+    const btn=document.getElementById('save-btn');
+    btn.textContent='✓ ¡Día 2 completado! +1 punto';
+    btn.classList.add('saved');
+    const nombre=load('femi_nombre')||'';
+    document.getElementById('cel-title').textContent='¡Ya sabes cuánto vale tu tiempo'+(nombre?', '+nombre:'')+'!';
+    document.getElementById('celebracion').classList.add('visible');
+  }
+});
+</script>
+</body>
+</html>
