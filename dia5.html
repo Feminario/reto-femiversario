@@ -470,33 +470,55 @@ function mostrarConexionD4(){
   if(libertad>0){
     document.getElementById('meta-calc').style.display='block';
     const brecha2=Math.max(libertad-pension,0);
-    const edad=parseFloat(load('femi_d4_edad'))||27;
-    const anios=Math.max(62-edad,1);
-    const meses=anios*12;
-    const r=0.06/12;
-    const capitalNec=brecha2*240;
-    let aporte=0;
-    if(brecha2>0&&meses>0) aporte=capitalNec*r/(Math.pow(1+r,meses)-1);
+    const edad=parseFloat(load('femi_d4_edad'))||parseFloat(load('femi_d3_edad'))||27;
+    const retiroSoniado=parseFloat(load('femi_d3_retiro'))||0;
+    const aniosLegal=Math.max(62-edad,1);
+    const aniosSoniado=retiroSoniado>edad?Math.max(retiroSoniado-edad,1):aniosLegal;
     const sal=parseFloat(load('femi_d2_salario'))||parseFloat(load('femi_d3_salario'))||0;
-    const pct=sal>0?Math.round(aporte/sal*100):0;
+
+    function calcAporte(anios){
+      const meses=anios*12;const r=0.06/12;const cap=brecha2*240;
+      if(brecha2<=0||meses<=0)return 0;
+      return cap*r/(Math.pow(1+r,meses)-1);
+    }
+    const aporteLegal=calcAporte(aniosLegal);
+    const aporteSoniado=calcAporte(aniosSoniado);
+    const pctLegal=sal>0?Math.round(aporteLegal/sal*100):0;
+    const pctSoniado=sal>0?Math.round(aporteSoniado/sal*100):0;
+
     let filas='';
     if(libertad>0) filas+=`<div class="meta-fila"><span class="meta-etiqueta">Tu número de la libertad</span><span class="meta-valor">${fmt(libertad)}/mes</span></div>`;
     if(pension>0) filas+=`<div class="meta-fila"><span class="meta-etiqueta">Tu pensión estimada (día 4)</span><span class="meta-valor">${fmt(pension)}/mes</span></div>`;
     if(brecha2>0) filas+=`<div class="meta-fila"><span class="meta-etiqueta">Brecha a cerrar</span><span class="meta-valor" style="color:var(--rojo);">${fmt(brecha2)}/mes</span></div>`;
-    filas+=`<div class="meta-fila"><span class="meta-etiqueta">Años hasta retiro (62)</span><span class="meta-valor">${anios} años</span></div>`;
     document.getElementById('meta-filas').innerHTML=filas;
-    let res='';
-    if(brecha2>0&&aporte>0){
-      res=`<div class="meta-res-label">Inversión mensual sugerida</div>
-        <div class="meta-res-monto">${fmt(Math.ceil(aporte/1000)*1000)}</div>
-        <div class="meta-res-sub">al mes durante ${anios} años · rendimiento estimado 6% anual${sal>0&&pct>0?' · ≈ '+pct+'% de tu salario':''}</div>
-        <div class="meta-res-frase">Eso es lo que separa tu pensión de tu libertad.</div>`;
-    } else if(brecha2===0){
-      res=`<div class="meta-res-label">Tu situación</div>
-        <div class="meta-res-monto" style="font-size:20px;color:var(--verde);">\u2705 Sin brecha pensional</div>
-        <div class="meta-res-sub">Tu pensión estimada cubre tu número de la libertad. Invertir igual te da margen y seguridad adicional.</div>`;
+
+    const mostrarDos=retiroSoniado>0&&Math.round(retiroSoniado)!==62;
+    let res='<div class="meta-res-label">Inversión mensual según cuándo te retiras</div>';
+    if(brecha2>0){
+      if(mostrarDos){
+        res+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 6px;">
+          <div style="background:var(--lila-l);border:1.5px solid var(--lila);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#7a40a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">&#127937; A los ${retiroSoniado} años</div>
+            <div style="font-size:22px;font-weight:700;color:#7a40a0;line-height:1;">${fmt(Math.ceil(aporteSoniado/1000)*1000)}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">en ${aniosSoniado} años${sal>0&&pctSoniado>0?' · '+pctSoniado+'% salario':''}</div>
+          </div>
+          <div style="background:var(--crema-l);border:1.5px solid var(--dorado);border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#9a6b10;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">&#127963;&#65039; Edad legal (62)</div>
+            <div style="font-size:22px;font-weight:700;color:#9a6b10;line-height:1;">${fmt(Math.ceil(aporteLegal/1000)*1000)}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">en ${aniosLegal} años${sal>0&&pctLegal>0?' · '+pctLegal+'% salario':''}</div>
+          </div>
+        </div>
+        <div class="meta-res-frase">Cuanto antes empieces, menos necesitas invertir cada mes.</div>`;
+      } else {
+        res+=`<div class="meta-res-monto">${fmt(Math.ceil(aporteLegal/1000)*1000)}</div>
+          <div class="meta-res-sub">al mes durante ${aniosLegal} años · rendimiento estimado 6% anual${sal>0&&pctLegal>0?' · ≈ '+pctLegal+'% de tu salario':''}</div>
+          <div class="meta-res-frase">Eso es lo que separa tu pensión de tu libertad.</div>`;
+      }
+    } else if(libertad>0){
+      res+=`<div class="meta-res-monto" style="font-size:20px;color:var(--verde);">&#10003; Sin brecha pensional</div>
+        <div class="meta-res-sub">Tu pensión cubre tu número de la libertad. Invertir igual te da margen adicional.</div>`;
     } else {
-      res=`<div class="meta-res-sub">Completa el Día 1 y el Día 4 para ver tu meta de inversión personalizada.</div>`;
+      res='<div class="meta-res-sub">Completa el Día 1 y el Día 4 para ver tu meta de inversión personalizada.</div>';
     }
     document.getElementById('meta-resultado').innerHTML=res;
   }
@@ -676,6 +698,21 @@ function guardar(){
     btn.textContent='Primero confirma la acción que tomaste \u2191';
     btn.style.background='#b07040';
     setTimeout(()=>{btn.textContent='\u2713 Completar el Día 5 y ganar mi punto';btn.style.background='';},2200);
+    return;
+  }
+  if(!screenshotSubido&&load('femi_d5_screenshot')!=='1'){
+    btn.textContent='Primero sube tu foto \u2191 (obligatorio)';
+    btn.style.background='var(--rojo)';
+    // Find which screenshot zone is active and pulse it
+    const tipo=load('femi_d5_accion');
+    const zonaId='screenshot-zone-'+(tipo==='xtb'?'nueva':'ya');
+    const zona=document.getElementById(zonaId);
+    if(zona){zona.classList.add('required-pulse');zona.scrollIntoView({behavior:'smooth',block:'center'});}
+    setTimeout(()=>{
+      btn.textContent='\u2713 Completar el Día 5 y ganar mi punto';
+      btn.style.background='';
+      if(zona)zona.classList.remove('required-pulse');
+    },2500);
     return;
   }
   save('femi_d5_listo','1');
