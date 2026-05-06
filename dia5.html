@@ -11,22 +11,19 @@
   --naranja:#F59356;--crema:#FFEAD2;--crema-l:#FFF7EF;
   --lila-l:#F9E1FF;--dorado:#F7C175;
   --texto:#2B2040;--muted:#6B6080;--border:rgba(126,132,174,0.2);
-  --xtb:#E8001C;
+  --xtb:#E8001C;--verde:#4a9e6e;--rojo:#E05050;
 }
 body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-serif;min-height:100vh;padding-bottom:48px;}
-
 .progress-bar-wrap{position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(126,132,174,.08);}
 .progress-label{font-size:11px;font-weight:700;color:var(--azul);white-space:nowrap;}
 .progress-track{flex:1;height:8px;background:var(--crema);border-radius:8px;overflow:hidden;}
 .progress-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--azul) 0%,var(--lila) 100%);transition:width .6s cubic-bezier(.4,0,.2,1);}
 .progress-pts{font-size:12px;font-weight:700;color:var(--azul);white-space:nowrap;min-width:36px;text-align:right;}
-
 .day-chips{display:flex;gap:4px;padding:0 16px 8px;background:white;justify-content:center;border-bottom:1px solid var(--border);}
 .chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .3s;}
 .chip.done{background:var(--azul);border-color:var(--azul);color:white;}
 .chip.active{border-color:var(--naranja);color:var(--naranja);}
-
-.header{background:linear-gradient(135deg,#1a1a2e 0%,#2d2060 60%,var(--azul) 100%);padding:20px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+.header{background:linear-gradient(135deg,#2a1a4a 0%,#3d2070 50%,#6a4a9a 100%);padding:20px 24px 28px;text-align:center;position:relative;overflow:hidden;}
 .header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:var(--crema-l);border-radius:20px 20px 0 0;}
 .logo-text{font-size:20px;font-weight:700;color:white;letter-spacing:.04em;}
 .logo-sub{font-size:10px;color:rgba(255,255,255,.65);letter-spacing:.05em;margin-top:2px;margin-bottom:14px;}
@@ -34,21 +31,39 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
 .header-title{font-size:clamp(20px,5vw,30px);font-weight:700;color:white;line-height:1.2;margin-bottom:6px;}
 .header-title em{font-style:italic;font-weight:400;color:var(--dorado);}
 .header-sub-text{font-size:12px;color:rgba(255,255,255,.8);}
-
 .content{max-width:600px;margin:0 auto;padding:20px 16px 0;}
 .card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(126,132,174,.06);}
 .card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul);margin-bottom:6px;}
 .card-title{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:10px;line-height:1.3;}
 .card-body{font-size:13px;color:var(--muted);line-height:1.8;}
 .card-body strong{color:var(--texto);font-weight:600;}
-
-/* ALERTA DE ACCIÓN */
-.accion-banner{background:linear-gradient(135deg,#1a1a2e,#2d2060);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px;}
+.callout{background:var(--lila-l);border-left:3px solid var(--lila);border-radius:0 10px 10px 0;padding:14px 16px;margin-top:14px;font-size:13px;color:var(--texto);line-height:1.7;font-weight:500;}
+/* BRECHA DIA 4 */
+.brecha-conexion{background:linear-gradient(135deg,#3a2a5a,#5a3080);border-radius:14px;padding:16px 18px;margin-bottom:14px;display:flex;gap:14px;align-items:flex-start;}
+.brecha-icono{font-size:26px;flex-shrink:0;margin-top:2px;}
+.brecha-texto{flex:1;}
+.brecha-titulo{font-size:13px;font-weight:700;color:var(--dorado);margin-bottom:4px;}
+.brecha-sub{font-size:12px;color:rgba(255,255,255,.82);line-height:1.6;}
+.brecha-num{display:inline-block;background:rgba(255,255,255,.15);border-radius:8px;padding:3px 10px;font-size:13px;font-weight:700;color:white;margin-top:6px;}
+/* META CALC */
+.meta-calc{background:linear-gradient(135deg,var(--crema),var(--lila-l));border:1.5px solid var(--lila);border-radius:14px;padding:16px;margin-bottom:14px;}
+.meta-calc-titulo{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a40a0;margin-bottom:8px;}
+.meta-calc-pregunta{font-size:14px;font-weight:700;color:var(--texto);margin-bottom:12px;line-height:1.4;}
+.meta-fila{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.meta-fila:last-child{border-bottom:none;}
+.meta-etiqueta{font-size:12px;color:var(--muted);}
+.meta-valor{font-size:13px;font-weight:700;color:var(--texto);}
+.meta-resultado{background:white;border-radius:12px;padding:14px;margin-top:12px;text-align:center;}
+.meta-res-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--azul);margin-bottom:4px;}
+.meta-res-monto{font-size:32px;font-weight:700;color:var(--azul);line-height:1;}
+.meta-res-sub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.meta-res-frase{font-size:12px;color:#7a40a0;font-weight:600;margin-top:8px;font-style:italic;}
+/* ACCION BANNER */
+.accion-banner{background:linear-gradient(135deg,#2a1a4a,#3d2070);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px;}
 .accion-emoji{font-size:32px;margin-bottom:8px;}
 .accion-title{font-size:18px;font-weight:700;color:white;margin-bottom:6px;}
 .accion-sub{font-size:12px;color:rgba(255,255,255,.75);line-height:1.7;}
-
-/* SELECTOR DE SITUACIÓN */
+/* SELECTOR */
 .situacion-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
 .situ-btn{border:2px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--crema-l);}
 .situ-btn:hover{border-color:var(--azul);}
@@ -56,61 +71,96 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
 .situ-icon{font-size:22px;margin-bottom:6px;}
 .situ-name{font-size:12px;font-weight:700;color:var(--texto);}
 .situ-desc{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4;}
-
-/* CAMINO XTB — nunca invirtió */
+/* XTB CARD */
 .xtb-card{display:none;background:white;border:2px solid var(--naranja);border-radius:16px;padding:20px;margin-bottom:14px;}
 .xtb-card.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
 @keyframes pop{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
-
-/* LINK XTB DESTACADO */
 .xtb-banner{background:linear-gradient(135deg,var(--xtb),#a00015);border-radius:14px;padding:20px;text-align:center;margin:16px 0;}
 .xtb-logo{font-size:11px;font-weight:700;letter-spacing:.2em;color:rgba(255,255,255,.7);text-transform:uppercase;margin-bottom:4px;}
 .xtb-headline{font-size:17px;font-weight:700;color:white;margin-bottom:6px;line-height:1.3;}
-.xtb-sub{font-size:12px;color:rgba(255,255,255,.8);margin-bottom:16px;line-height:1.6;}
-.xtb-warning{font-size:11px;color:rgba(255,255,255,.9);background:rgba(0,0,0,.25);border-radius:8px;padding:8px 12px;margin-bottom:14px;font-weight:600;}
+.xtb-sub{font-size:12px;color:rgba(255,255,255,.85);margin-bottom:16px;line-height:1.7;}
+.xtb-badge{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:11px;color:white;font-weight:700;margin-bottom:14px;}
 .btn-xtb{display:block;width:100%;padding:16px;background:white;border:none;border-radius:12px;color:var(--xtb);font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:background .15s,transform .1s;letter-spacing:.02em;}
 .btn-xtb:hover{background:#fff5f5;}
 .btn-xtb:active{transform:scale(.98);}
-
-/* PASOS */
 .pasos{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
 .paso{display:flex;gap:12px;align-items:flex-start;}
 .paso-num{width:28px;height:28px;border-radius:50%;background:var(--naranja);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-.paso-content{}
 .paso-title{font-size:13px;font-weight:700;color:var(--texto);margin-bottom:2px;}
 .paso-desc{font-size:12px;color:var(--muted);line-height:1.6;}
 .paso-desc strong{color:var(--texto);}
-
-/* CAMINO YA INVIERTE */
+/* CALCULADORA ETF */
+.calc-embed{display:none;margin-top:16px;}
+.calc-embed.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
+.calc-header{background:linear-gradient(135deg,var(--azul),var(--lila));border-radius:14px 14px 0 0;padding:16px 18px;color:white;}
+.calc-header-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.calc-header-sub{font-size:11px;color:rgba(255,255,255,.8);}
+.calc-body{background:white;border:1px solid var(--border);border-radius:0 0 14px 14px;padding:16px;}
+.etf-explainer{background:var(--crema-l);border:1px solid var(--dorado);border-radius:12px;padding:14px;margin-bottom:14px;}
+.etf-explainer-title{font-size:12px;font-weight:700;color:var(--texto);margin-bottom:6px;}
+.etf-explainer-body{font-size:12px;color:var(--muted);line-height:1.7;}
+.etf-explainer-body strong{color:var(--texto);}
+input[type=range]{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--azul-l);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--azul);cursor:pointer;border:3px solid white;box-shadow:0 2px 8px rgba(126,132,174,.35);}
+.slider-wrap{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.slider-label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.slider-val{font-size:24px;font-weight:700;color:var(--azul);min-width:40px;text-align:right;}
+.perfil-badge{display:inline-block;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;margin-bottom:12px;}
+.alloc-row{display:flex;gap:8px;margin-bottom:14px;}
+.alloc-box{flex:1;border-radius:10px;padding:10px 8px;text-align:center;}
+.alloc-pct{font-size:20px;font-weight:700;margin-bottom:2px;}
+.alloc-lbl{font-size:10px;font-weight:600;}
+.etf-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.etf-mini{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--crema-l);}
+.etf-mini.fem{border-color:var(--lila);background:var(--lila-l);}
+.etf-ticker-wrap{display:flex;align-items:baseline;gap:5px;margin-bottom:3px;}
+.etf-ticker{font-size:15px;font-weight:700;color:var(--texto);}
+.etf-ticker-hint{font-size:9px;color:var(--muted);}
+.etf-name{font-size:10px;color:var(--muted);margin-bottom:3px;line-height:1.4;}
+.etf-desc-mini{font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:4px;}
+.etf-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.etf-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.tag-high{background:var(--crema);color:#B55A20;}
+.tag-mod{background:#FEF7E0;color:#9A6B10;}
+.tag-low{background:#EEE8FF;color:var(--azul);}
+.tag-fem{background:var(--lila-l);color:#7a40a0;}
+.calc-disclaimer{font-size:10px;color:#c0bbd0;margin-top:8px;line-height:1.5;}
+.btn-toggle{display:block;width:100%;margin-top:14px;padding:11px;background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;color:var(--azul);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-toggle:hover{background:var(--azul-l);}
+/* SCREENSHOT */
+.screenshot-zone{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;margin-top:14px;background:var(--crema-l);}
+.screenshot-zone:hover{border-color:var(--azul);background:white;}
+.screenshot-zone.has-img{border-color:var(--verde);border-style:solid;background:rgba(74,158,110,.04);}
+.screenshot-zone.required-pulse{border-color:var(--rojo)!important;animation:pulse-border 1s ease 2;}
+@keyframes pulse-border{0%,100%{border-color:var(--rojo);}50%{border-color:rgba(224,80,80,.2);}}
+.screenshot-zone input{display:none;}
+.screenshot-icon{font-size:28px;margin-bottom:6px;}
+.screenshot-label{font-size:12px;font-weight:600;color:var(--muted);}
+.screenshot-hint{font-size:10px;color:#c0bbd0;margin-top:3px;}
+.screenshot-preview{display:none;max-width:100%;border-radius:10px;margin-top:10px;}
+/* YA INVIERTE */
 .ya-invierte-card{display:none;background:white;border:2px solid var(--azul);border-radius:16px;padding:20px;margin-bottom:14px;}
 .ya-invierte-card.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
-
 .opciones-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px;}
 .opcion-check{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--crema-l);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;}
 .opcion-check:hover{border-color:var(--azul);}
-.opcion-check.done{border-color:#4a9e6e;background:rgba(74,158,110,.06);}
+.opcion-check.done{border-color:var(--verde);background:rgba(74,158,110,.06);}
 .opcion-check input[type=checkbox]{width:18px;height:18px;accent-color:var(--azul);flex-shrink:0;margin-top:1px;}
 .opcion-label{font-size:13px;color:var(--texto);line-height:1.5;}
 .opcion-label span{font-size:11px;color:var(--muted);display:block;margin-top:2px;}
-
-/* CONFIRMACIÓN ACCIÓN */
 .confirm-card{display:none;margin-bottom:14px;}
 .confirm-card.visible{display:block;}
 .confirm-inner{background:linear-gradient(135deg,var(--menta),var(--crema));border:2px solid #7abf45;border-radius:14px;padding:18px;text-align:center;}
 .confirm-emoji{font-size:32px;margin-bottom:8px;}
 .confirm-title{font-size:15px;font-weight:700;color:#2d5a1a;margin-bottom:6px;}
 .confirm-sub{font-size:12px;color:#4a7a2a;line-height:1.6;}
-
-/* TEXTAREA + BOTÓN */
 .reflection-area{width:100%;background:var(--crema-l);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--texto);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.7;resize:vertical;min-height:70px;margin-top:12px;transition:border-color .15s;}
 .reflection-area:focus{outline:none;border-color:var(--azul);background:white;}
 .reflection-area::placeholder{color:#c0bbd0;}
 .btn-primary{display:block;width:100%;margin-top:12px;padding:14px;background:var(--naranja);border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;}
 .btn-primary:hover{background:#e07d3d;}
 .btn-primary:active{transform:scale(.98);}
-.btn-primary.saved{background:#4a9e6e;}
-
-/* CELEBRACIÓN */
+.btn-primary.saved{background:var(--verde);}
 .celebracion{display:none;margin-top:14px;background:linear-gradient(135deg,var(--menta) 0%,var(--crema) 100%);border:2px solid #7abf45;border-radius:16px;padding:20px;}
 .celebracion.visible{display:block;animation:pop .4s cubic-bezier(.4,0,.2,1);}
 .celebracion-emoji{font-size:36px;margin-bottom:8px;text-align:center;}
@@ -123,7 +173,6 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
 .btn-copy:hover{background:var(--menta);}
 .btn-wa-grupo{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#25D366;border:none;border-radius:12px;color:white;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;}
 .btn-wa-grupo:hover{background:#1db954;}
-
 .card-menta{background:white;border:1.5px solid var(--menta);border-radius:16px;padding:18px 20px;margin-bottom:14px;}
 .menta-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4a7a2a;margin-bottom:6px;}
 .footer{text-align:center;padding:16px 0 0;border-top:1px solid var(--border);margin-top:6px;}
@@ -136,11 +185,10 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
 </style>
 </head>
 <body>
-
 <div class="progress-bar-wrap">
   <span class="progress-label">Tu progreso</span>
   <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-  <span class="progress-pts" id="progress-pts">0/7 ⭐</span>
+  <span class="progress-pts" id="progress-pts">0/7 &#11088;</span>
 </div>
 <div class="day-chips">
   <div class="chip" id="chip1">1</div><div class="chip" id="chip2">2</div>
@@ -148,7 +196,6 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
   <div class="chip active" id="chip5">5</div>
   <div class="chip" id="chip6">6</div><div class="chip" id="chip7">7</div>
 </div>
-
 <div class="header">
   <div class="logo-text">feminario</div>
   <div class="logo-sub">el espacio seguro donde las mujeres redefinimos la autonomía económica</div>
@@ -156,14 +203,30 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
   <h1 class="header-title">Hoy no reflexionamos. <em>Hoy hacemos.</em></h1>
   <p class="header-sub-text">El único día del reto donde la tarea es una sola acción real.</p>
 </div>
-
 <div class="content">
 
-  <!-- BANNER DE ACCIÓN -->
   <div class="accion-banner">
-    <div class="accion-emoji">⚡</div>
+    <div class="accion-emoji">&#9889;</div>
     <div class="accion-title">Este día es diferente.</div>
     <div class="accion-sub">No hay lectura larga. No hay cálculo. Hay una sola tarea: tomar una acción financiera real hoy.<br><br>El miedo no se va esperando. Se va haciendo.</div>
+  </div>
+
+  <!-- CONEXIÓN DÍA 4 -->
+  <div class="brecha-conexion" id="brecha-conexion" style="display:none;">
+    <div class="brecha-icono">&#128279;</div>
+    <div class="brecha-texto">
+      <div class="brecha-titulo">Ayer viste tu hueco pensional.</div>
+      <div class="brecha-sub">Hay una brecha entre lo que te daría la pensión y lo que necesitas para vivir como quieres. La manera de cerrarla no es esperar — es invertir hoy, todos los meses, con constancia. Por eso este día existe.</div>
+      <div class="brecha-num" id="brecha-conexion-num"></div>
+    </div>
+  </div>
+
+  <!-- CALCULADORA META -->
+  <div class="meta-calc" id="meta-calc" style="display:none;">
+    <div class="meta-calc-titulo">&#128208; Tu meta de inversión personal</div>
+    <div class="meta-calc-pregunta">¿Cuánto necesitas invertir mensualmente para cerrar tu brecha?</div>
+    <div id="meta-filas"></div>
+    <div class="meta-resultado" id="meta-resultado"></div>
   </div>
 
   <!-- SELECTOR -->
@@ -172,76 +235,87 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
     <div class="card-title">Selecciona tu situación actual</div>
     <div class="situacion-grid">
       <div class="situ-btn" id="btn-nueva" onclick="seleccionar('nueva')">
-        <div class="situ-icon">🌱</div>
+        <div class="situ-icon">&#127807;</div>
         <div class="situ-name">Nunca he invertido</div>
         <div class="situ-desc">Hoy abro mi primera cuenta de inversiones</div>
       </div>
       <div class="situ-btn" id="btn-ya" onclick="seleccionar('ya')">
-        <div class="situ-icon">📈</div>
+        <div class="situ-icon">&#128200;</div>
         <div class="situ-name">Ya tengo cuenta</div>
         <div class="situ-desc">Hoy reviso, ajusto o aporto a lo que tengo</div>
       </div>
     </div>
   </div>
 
-  <!-- CAMINO A: NUNCA HA INVERTIDO → XTB -->
+  <!-- CAMINO A: NUNCA HA INVERTIDO -->
   <div class="xtb-card" id="xtb-card">
     <div class="card-label">Tu tarea de hoy</div>
-    <div class="card-title">Abre tu cuenta de inversiones ahora mismo.</div>
-    <p class="card-body">La plataforma que usamos en Feminario es <strong>XTB</strong> — una de las más grandes del mundo, con acceso a más de 6.000 instrumentos financieros, sin comisión en los primeros $100.000 USD al mes.</p>
-
+    <div class="card-title">Tu primera inversión empieza con una cuenta. Hoy la abres.</div>
+    <p class="card-body">Después de probar varias plataformas, la que más nos convenció — y la que nosotras mismas usamos — es <strong>XTB</strong>. No te la recomendamos porque toca, te la recomendamos porque funciona: cero comisiones, sin mínimo obligatorio, y puedes empezar desde <strong>menos de 40.000 pesos</strong> (10 USD). Literalmente el precio de un almuerzo.</p>
+    <div class="callout">
+      &#128161; El 78% de las mujeres que nunca han invertido dice que el principal freno es el miedo, no la plata. Abrir la cuenta ya es el paso más difícil — y lo puedes hacer hoy en 5 minutos.
+    </div>
     <div class="xtb-banner">
       <div class="xtb-logo">XTB · Plataforma de inversiones</div>
       <div class="xtb-headline">Abre tu cuenta gratuita hoy</div>
-      <div class="xtb-sub">Sin depósito mínimo. Sin comisión hasta $100.000 USD al mes. Regulada internacionalmente. La misma plataforma que usamos Andrea y Tina.</div>
-      <div class="xtb-warning">⚠️ Es importante abrir la cuenta usando el link de abajo. Es el único link habilitado para nuestra comunidad.</div>
-      <a class="btn-xtb" href="https://geolink.xtb.com/yxxw1" target="_blank" onclick="marcarXTB()">
-        → Abrir mi cuenta en XTB ahora
-      </a>
+      <div class="xtb-sub">Sin depósito mínimo. Puedes empezar desde 10 USD — menos de 40.000 COP.<br>Regulada internacionalmente. La que usamos Andrea y Tina.</div>
+      <div class="xtb-badge">&#11088; La plataforma que usamos en Feminario</div>
+      <a class="btn-xtb" href="https://geolink.xtb.com/yxxw1" target="_blank" onclick="marcarXTB()">&#8594; Abrir mi cuenta en XTB ahora</a>
     </div>
-
     <div class="pasos">
       <div class="card-label" style="margin-bottom:8px;">Paso a paso: qué hacer después de abrir la cuenta</div>
-      <div class="paso">
-        <div class="paso-num">1</div>
-        <div class="paso-content">
-          <div class="paso-title">Haz clic en el link de arriba</div>
-          <div class="paso-desc">Se abre el registro de XTB. Llena tus datos básicos. El proceso toma <strong>menos de 5 minutos</strong>.</div>
-        </div>
-      </div>
-      <div class="paso">
-        <div class="paso-num">2</div>
-        <div class="paso-content">
-          <div class="paso-title">Verifica tu identidad</div>
-          <div class="paso-desc">Van a pedirte tu cédula y una foto. Es un proceso regulado — completamente normal y seguro.</div>
-        </div>
-      </div>
-      <div class="paso">
-        <div class="paso-num">3</div>
-        <div class="paso-content">
-          <div class="paso-title">Haz tu primer depósito</div>
-          <div class="paso-desc">El monto lo decides tú. <strong>No hay mínimo</strong>. Puedes empezar con lo que tengas disponible hoy.</div>
-        </div>
-      </div>
-      <div class="paso">
-        <div class="paso-num">4</div>
-        <div class="paso-content">
-          <div class="paso-title">Cuéntalo en el grupo del reto</div>
-          <div class="paso-desc">No tienes que decir cuánto. Solo que lo hiciste. Ese mensaje es el más poderoso del reto.</div>
-        </div>
-      </div>
+      <div class="paso"><div class="paso-num">1</div><div class="paso-content"><div class="paso-title">Haz clic en el link de arriba</div><div class="paso-desc">Se abre el registro de XTB. Llena tus datos básicos. El proceso toma <strong>menos de 5 minutos</strong>.</div></div></div>
+      <div class="paso"><div class="paso-num">2</div><div class="paso-content"><div class="paso-title">Verifica tu identidad</div><div class="paso-desc">Te piden tu cédula y una foto. Es un proceso regulado — completamente normal y seguro.</div></div></div>
+      <div class="paso"><div class="paso-num">3</div><div class="paso-content"><div class="paso-title">Haz tu primer depósito — desde lo que tengas</div><div class="paso-desc">No hay mínimo obligatorio. <strong>Puedes empezar con 10 USD (menos de 40.000 COP)</strong>. Lo que importa no es el monto — es el hábito.</div></div></div>
+      <div class="paso"><div class="paso-num">4</div><div class="paso-content"><div class="paso-title">¿En qué invertir? Aquí te guiamos &#128071;</div><div class="paso-desc">Usa la herramienta de abajo para ver qué instrumentos van con tu edad y perfil.</div></div></div>
     </div>
 
-    <div style="margin-top:16px;background:var(--crema);border-radius:12px;padding:14px;border:1px solid var(--dorado);">
-      <p style="font-size:12px;color:var(--muted);line-height:1.7;"><strong style="color:var(--texto);">¿Y si me da miedo?</strong> Normal. El 78% de las personas que nunca han invertido dicen que el miedo es el principal freno. Pero el miedo no se va leyendo más — se va haciendo algo pequeño. Abrir la cuenta ya es ese algo.</p>
+    <!-- CALC ETF NUEVA -->
+    <div class="calc-embed" id="calc-embed-nueva">
+      <div class="calc-header">
+        <div class="calc-header-title">&#128202; ¿En qué debería invertir yo?</div>
+        <div class="calc-header-sub">Mueve el slider hasta tu edad y te decimos qué instrumentos van con tu perfil</div>
+      </div>
+      <div class="calc-body">
+        <div class="etf-explainer">
+          <div class="etf-explainer-title">&#128161; ¿Qué es un ETF? (para quien nunca ha invertido)</div>
+          <div class="etf-explainer-body">Un ETF es como una <strong>bolsita que contiene muchas acciones a la vez</strong>. En lugar de apostar todo a una sola empresa, compras un poquito de cientos al mismo tiempo — eso se llama <strong>diversificar</strong>, y es la manera más inteligente de reducir el riesgo.<br><br>El <strong>ticker</strong> (ej: VOO, QQQ) es simplemente el <strong>nombre corto con el que lo buscas dentro de XTB</strong>, como si fuera un código. Lo escribes en el buscador de la app y aparece de inmediato.</div>
+        </div>
+        <div class="slider-wrap">
+          <span class="slider-label">Tu edad</span>
+          <input type="range" min="18" max="65" value="27" id="age-slider-nueva" oninput="actualizarCalc('nueva',this.value)">
+          <span class="slider-val" id="age-out-nueva">27</span>
+        </div>
+        <div id="calc-perfil-badge-nueva" class="perfil-badge"></div>
+        <div class="alloc-row" id="calc-alloc-nueva"></div>
+        <p style="font-size:11px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">ETFs recomendados para tu perfil</p>
+        <div class="etf-mini-grid" id="calc-etfs-nueva"></div>
+        <p style="font-size:11px;font-weight:700;color:#7a40a0;text-transform:uppercase;letter-spacing:.1em;margin:10px 0 8px;">&#127807; ETFs con propósito (género y sostenibilidad)</p>
+        <div class="etf-mini-grid" id="calc-fem-etfs-nueva"></div>
+        <p class="calc-disclaimer">Basada en la Regla del 110. Es una guía educativa, no asesoría personalizada. Úsala como punto de partida.</p>
+      </div>
+    </div>
+    <button class="btn-toggle" id="btn-calc-toggle-nueva" onclick="toggleCalc('nueva')">&#128202; Ver en qué invertir según mi edad</button>
+
+    <div style="margin-top:14px;background:var(--crema);border-radius:12px;padding:14px;border:1px solid var(--dorado);">
+      <p style="font-size:12px;color:var(--muted);line-height:1.7;"><strong style="color:var(--texto);">¿Y si me da miedo?</strong> Normal. El miedo no se va leyendo más — se va haciendo algo pequeño. Abrir la cuenta ya es ese algo.</p>
     </div>
 
-    <!-- CONFIRMACIÓN XTB -->
+    <!-- SCREENSHOT OBLIGATORIO - camino A -->
+    <div style="margin-top:16px;">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:700;">&#128247; Sube una foto de tu cuenta abierta o tu primera inversión</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">Es obligatorio para completar el día. Solo la ves tú — es tu primer registro. &#128156;</p>
+      <div class="screenshot-zone" id="screenshot-zone-nueva" onclick="document.getElementById('screenshot-input-nueva').click()">
+        <input type="file" id="screenshot-input-nueva" accept="image/*" onchange="mostrarScreenshot('nueva',this)">
+        <div class="screenshot-icon">&#128247;</div>
+        <div class="screenshot-label" id="ss-label-nueva">Toca para subir tu screenshot</div>
+        <div class="screenshot-hint" id="ss-hint-nueva">Requerido para completar el Día 5</div>
+        <img class="screenshot-preview" id="screenshot-preview-nueva" alt="Tu screenshot">
+      </div>
+    </div>
     <div style="margin-top:14px;">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Cuando hayas abierto la cuenta, confirma aquí:</p>
-      <button class="btn-primary" id="btn-confirm-xtb" onclick="confirmarAccion('xtb')" style="margin-top:0;">
-        ✓ Abrí mi cuenta en XTB
-      </button>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Cuando hayas abierto la cuenta y subido tu foto, confirma aquí:</p>
+      <button class="btn-primary" id="btn-confirm-xtb" onclick="confirmarAccion('xtb')" style="margin-top:0;">&#10003; Abrí mi cuenta en XTB</button>
     </div>
   </div>
 
@@ -250,71 +324,81 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
     <div class="card-label">Tu tarea de hoy</div>
     <div class="card-title">Ya tienes cuenta. Hoy la revisas y haces algo con ella.</div>
     <p class="card-body" style="margin-bottom:14px;">Elige una o más de estas acciones. Lo que sea — pero algo real, hoy:</p>
-
     <div class="opciones-grid" id="opciones">
-      <label class="opcion-check" id="op1">
-        <input type="checkbox" onchange="checkOpcion()">
-        <div class="opcion-label">Hice un nuevo aporte a mi cuenta de inversiones
-          <span>Cualquier monto. Reforzar el hábito es lo que importa.</span>
-        </div>
-      </label>
-      <label class="opcion-check" id="op2">
-        <input type="checkbox" onchange="checkOpcion()">
-        <div class="opcion-label">Revisé mi portafolio y entendí qué tengo
-          <span>Sé qué instrumentos tengo, cuánto llevan de rendimiento y por qué los elegí.</span>
-        </div>
-      </label>
-      <label class="opcion-check" id="op3">
-        <input type="checkbox" onchange="checkOpcion()">
-        <div class="opcion-label">Configuré o revisé mis aportes automáticos
-          <span>El ahorro automático es la herramienta más poderosa que existe.</span>
-        </div>
-      </label>
-      <label class="opcion-check" id="op4">
-        <input type="checkbox" onchange="checkOpcion()">
-        <div class="opcion-label">Aprendí algo nuevo sobre lo que tengo invertido
-          <span>Leí, busqué, pregunté. Entender lo que tienes ya es acción.</span>
-        </div>
-      </label>
-      <label class="opcion-check" id="op5">
-        <input type="checkbox" onchange="checkOpcion()">
-        <div class="opcion-label">Abrí una cuenta adicional o en una nueva plataforma
-          <span>Diversificar también es una decisión.</span>
-        </div>
-      </label>
+      <label class="opcion-check" id="op1"><input type="checkbox" onchange="checkOpcion()"><div class="opcion-label">Hice un nuevo aporte a mi cuenta de inversiones<span>Cualquier monto. Reforzar el hábito es lo que importa.</span></div></label>
+      <label class="opcion-check" id="op2"><input type="checkbox" onchange="checkOpcion()"><div class="opcion-label">Revisé mi portafolio y entendí qué tengo<span>Sé qué instrumentos tengo, cuánto llevan de rendimiento y por qué los elegí.</span></div></label>
+      <label class="opcion-check" id="op3"><input type="checkbox" onchange="checkOpcion()"><div class="opcion-label">Configuré o revisé mis aportes automáticos<span>El ahorro automático es la herramienta más poderosa que existe.</span></div></label>
+      <label class="opcion-check" id="op4"><input type="checkbox" onchange="checkOpcion()"><div class="opcion-label">Rebalanceé o invertí en un instrumento nuevo<span>Ajustar tu portafolio también es una decisión activa.</span></div></label>
+      <label class="opcion-check" id="op5"><input type="checkbox" onchange="checkOpcion()"><div class="opcion-label">Abrí una cuenta adicional o en una nueva plataforma<span>Diversificar también es una decisión.</span></div></label>
     </div>
-
     <div class="confirm-card" id="confirm-ya">
       <div class="confirm-inner">
-        <div class="confirm-emoji">⚡</div>
+        <div class="confirm-emoji">&#9889;</div>
         <div class="confirm-title">¡Eso cuenta! Ya tomaste acción hoy.</div>
-        <div class="confirm-sub">Cada vez que haces algo con tu plata en lugar de posponerlo, estás cerrando la brecha que viste en los últimos días.</div>
+        <div class="confirm-sub">Cada vez que haces algo con tu plata en lugar de posponerlo, estás cerrando la brecha que viste ayer.</div>
       </div>
     </div>
 
-    <button class="btn-primary" id="btn-confirm-ya" onclick="confirmarAccion('ya')" style="display:none;margin-top:12px;">
-      ✓ Confirmé mi acción de hoy
-    </button>
+    <!-- CALC ETF YA INVIERTE -->
+    <div class="calc-embed visible" id="calc-embed-ya" style="margin-top:14px;">
+      <div class="calc-header">
+        <div class="calc-header-title">&#128202; ¿Estás invirtiendo en lo que va con tu perfil?</div>
+        <div class="calc-header-sub">Revisa si tus instrumentos actuales se alinean con tu edad y tolerancia al riesgo</div>
+      </div>
+      <div class="calc-body">
+        <div class="etf-explainer">
+          <div class="etf-explainer-title">&#128161; ¿Qué es un ETF?</div>
+          <div class="etf-explainer-body">Un ETF es una <strong>bolsita de muchas acciones</strong> — al diversificar se reduce el riesgo porque no dependes de una empresa. El <strong>ticker</strong> (ej: VOO, QQQ) es el <strong>nombre corto para buscarlo en tu plataforma</strong>.</div>
+        </div>
+        <div class="slider-wrap">
+          <span class="slider-label">Tu edad</span>
+          <input type="range" min="18" max="65" value="27" id="age-slider-ya" oninput="actualizarCalc('ya',this.value)">
+          <span class="slider-val" id="age-out-ya">27</span>
+        </div>
+        <div id="calc-perfil-badge-ya" class="perfil-badge"></div>
+        <div class="alloc-row" id="calc-alloc-ya"></div>
+        <p style="font-size:11px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">ETFs recomendados para tu perfil</p>
+        <div class="etf-mini-grid" id="calc-etfs-ya"></div>
+        <p style="font-size:11px;font-weight:700;color:#7a40a0;text-transform:uppercase;letter-spacing:.1em;margin:10px 0 8px;">&#127807; ETFs con propósito (género y sostenibilidad)</p>
+        <div class="etf-mini-grid" id="calc-fem-etfs-ya"></div>
+        <p class="calc-disclaimer">Basada en la Regla del 110. Es una guía educativa, no asesoría personalizada.</p>
+      </div>
+    </div>
+    <button class="btn-toggle" id="btn-calc-toggle-ya" onclick="toggleCalc('ya')" style="margin-bottom:14px;">&#10005; Cerrar guía de inversiones</button>
+
+    <!-- SCREENSHOT OBLIGATORIO - camino B -->
+    <div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:700;">&#128247; Sube una foto de lo que hiciste hoy</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">Tu portafolio, tu aporte, tu nuevo instrumento. Requerido para completar el día. Solo la ves tú. &#128156;</p>
+      <div class="screenshot-zone" id="screenshot-zone-ya" onclick="document.getElementById('screenshot-input-ya').click()">
+        <input type="file" id="screenshot-input-ya" accept="image/*" onchange="mostrarScreenshot('ya',this)">
+        <div class="screenshot-icon">&#128247;</div>
+        <div class="screenshot-label" id="ss-label-ya">Toca para subir tu screenshot</div>
+        <div class="screenshot-hint" id="ss-hint-ya">Requerido para completar el Día 5</div>
+        <img class="screenshot-preview" id="screenshot-preview-ya" alt="Tu screenshot">
+      </div>
+    </div>
+    <button class="btn-primary" id="btn-confirm-ya" onclick="confirmarAccion('ya')" style="display:none;margin-top:14px;">&#10003; Confirmé mi acción de hoy</button>
   </div>
 
-  <!-- REFLEXIÓN (aparece después de confirmar) -->
+  <!-- REFLEXIÓN -->
   <div class="card" id="reflexion-card" style="display:none;">
     <div class="card-label">Una sola pregunta</div>
     <div class="card-title">¿Qué hiciste hoy? Solo eso.</div>
     <p class="card-body">No tienes que justificarlo ni explicarlo. Solo describe en una frase la acción que tomaste.</p>
-    <textarea class="reflection-area" id="reflection" placeholder="Ej: 'Abrí mi cuenta en XTB' / 'Hice mi primer aporte' / 'Revisé mi portafolio por primera vez'" oninput="guardarTexto()"></textarea>
-    <button class="btn-primary" id="save-btn" onclick="guardar()">✓ Completar el Día 5 y ganar mi punto</button>
+    <textarea class="reflection-area" id="reflection" placeholder="Ej: 'Abrí mi cuenta en XTB' / 'Hice mi primer aporte de 50.000 pesos' / 'Revisé mi portafolio y rebalanceé'" oninput="guardarTexto()"></textarea>
+    <button class="btn-primary" id="save-btn" onclick="guardar()">&#10003; Completar el Día 5 y ganar mi punto</button>
   </div>
 
   <!-- CELEBRACIÓN -->
   <div class="celebracion" id="celebracion">
-    <div class="celebracion-emoji">🎉⚡</div>
-    <div class="celebracion-title" id="cel-title">¡Lo hiciste! Hoy pasaste del 'voy a hacerlo' al 'lo hice'.</div>
-    <div class="celebracion-sub">Ese momento es el más importante de la semana. Cuéntaselo a la comunidad — tu mensaje puede ser el empujón que otra mujer necesitaba.</div>
+    <div class="celebracion-emoji">&#127881;&#9889;</div>
+    <div class="celebracion-title" id="cel-title">¡Lo hiciste!</div>
+    <div class="celebracion-sub">Este momento es el más importante de la semana. Cuéntaselo a la comunidad — tu mensaje puede ser el empujón que otra mujer necesitaba.</div>
     <div class="wa-steps">
       <div>
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
-        <div class="msg-box" id="wa-msg">Lo hice ⚡
+        <div class="msg-box" id="wa-msg">Lo hice &#9889;
 
 Completé el Día 5 del Reto Feminversario de Feminario y tomé mi primera acción financiera real.
 
@@ -322,11 +406,11 @@ El miedo no se va esperando. Se va haciendo.
 
 ¿Ya lo hiciste tú?
 #RetoFeminversario</div>
-        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
+        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">&#128203; Copiar mensaje</button>
       </div>
       <div>
         <div class="wa-step-label">Paso 2 · Ábrelo en el grupo</div>
-        <a class="btn-wa-grupo" href="https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN" target="_blank">💬 Abrir grupo del reto en WhatsApp</a>
+        <a class="btn-wa-grupo" href="https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN" target="_blank">&#128172; Abrir grupo del reto en WhatsApp</a>
       </div>
     </div>
   </div>
@@ -343,8 +427,7 @@ El miedo no se va esperando. Se va haciendo.
       <span class="nav-label">Día 5</span>
       <div class="dots">
         <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div>
-        <div class="dot active"></div>
-        <div class="dot"></div><div class="dot"></div>
+        <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
       </div>
       <span class="nav-label">7 días</span>
     </div>
@@ -355,19 +438,68 @@ El miedo no se va esperando. Se va haciendo.
 <script>
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+function fmt(n){return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
 let situacion='';
+let screenshotSubido=false;
+let calcVisibleNueva=false;
+let calcVisibleYa=true; // empieza visible en camino B
 
 function actualizarProgreso(){
   const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
   const pts=dias.filter(d=>load(d)==='1').length;
   document.getElementById('progress-fill').style.width=(pts/7*100)+'%';
-  document.getElementById('progress-pts').textContent=pts+'/7 ⭐';
+  document.getElementById('progress-pts').textContent=pts+'/7 \u2b50';
   dias.forEach((d,i)=>{
     const c=document.getElementById('chip'+(i+1));
     if(!c)return;
-    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='✓';}
-    else if(i===4&&load(d)!=='1'){c.classList.add('active');}
+    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='\u2713';}
+    else if(i===4&&load(d)!=='\u0031'){c.classList.add('active');}
   });
+}
+
+function mostrarConexionD4(){
+  const pension=parseFloat(load('femi_d4_pension'))||0;
+  const libertad=parseFloat(load('femi_d1_numero'))||0;
+  const brecha=Math.max(libertad-pension,0);
+  if(pension>0||libertad>0){
+    document.getElementById('brecha-conexion').style.display='flex';
+    const numEl=document.getElementById('brecha-conexion-num');
+    if(brecha>0) numEl.textContent='Brecha mensual: '+fmt(brecha)+' que cerrar con inversiones';
+    else if(libertad>0) numEl.textContent='Tu número de la libertad: '+fmt(libertad)+' al mes';
+  }
+  if(libertad>0){
+    document.getElementById('meta-calc').style.display='block';
+    const brecha2=Math.max(libertad-pension,0);
+    const edad=parseFloat(load('femi_d4_edad'))||27;
+    const anios=Math.max(62-edad,1);
+    const meses=anios*12;
+    const r=0.06/12;
+    const capitalNec=brecha2*240;
+    let aporte=0;
+    if(brecha2>0&&meses>0) aporte=capitalNec*r/(Math.pow(1+r,meses)-1);
+    const sal=parseFloat(load('femi_d2_salario'))||parseFloat(load('femi_d3_salario'))||0;
+    const pct=sal>0?Math.round(aporte/sal*100):0;
+    let filas='';
+    if(libertad>0) filas+=`<div class="meta-fila"><span class="meta-etiqueta">Tu número de la libertad</span><span class="meta-valor">${fmt(libertad)}/mes</span></div>`;
+    if(pension>0) filas+=`<div class="meta-fila"><span class="meta-etiqueta">Tu pensión estimada (día 4)</span><span class="meta-valor">${fmt(pension)}/mes</span></div>`;
+    if(brecha2>0) filas+=`<div class="meta-fila"><span class="meta-etiqueta">Brecha a cerrar</span><span class="meta-valor" style="color:var(--rojo);">${fmt(brecha2)}/mes</span></div>`;
+    filas+=`<div class="meta-fila"><span class="meta-etiqueta">Años hasta retiro (62)</span><span class="meta-valor">${anios} años</span></div>`;
+    document.getElementById('meta-filas').innerHTML=filas;
+    let res='';
+    if(brecha2>0&&aporte>0){
+      res=`<div class="meta-res-label">Inversión mensual sugerida</div>
+        <div class="meta-res-monto">${fmt(Math.ceil(aporte/1000)*1000)}</div>
+        <div class="meta-res-sub">al mes durante ${anios} años · rendimiento estimado 6% anual${sal>0&&pct>0?' · ≈ '+pct+'% de tu salario':''}</div>
+        <div class="meta-res-frase">Eso es lo que separa tu pensión de tu libertad.</div>`;
+    } else if(brecha2===0){
+      res=`<div class="meta-res-label">Tu situación</div>
+        <div class="meta-res-monto" style="font-size:20px;color:var(--verde);">\u2705 Sin brecha pensional</div>
+        <div class="meta-res-sub">Tu pensión estimada cubre tu número de la libertad. Invertir igual te da margen y seguridad adicional.</div>`;
+    } else {
+      res=`<div class="meta-res-sub">Completa el Día 1 y el Día 4 para ver tu meta de inversión personalizada.</div>`;
+    }
+    document.getElementById('meta-resultado').innerHTML=res;
+  }
 }
 
 function seleccionar(tipo){
@@ -378,85 +510,206 @@ function seleccionar(tipo){
   document.getElementById('xtb-card').classList.remove('visible');
   document.getElementById('ya-invierte-card').classList.remove('visible');
   if(tipo==='nueva') document.getElementById('xtb-card').classList.add('visible');
-  else document.getElementById('ya-invierte-card').classList.add('visible');
+  else {
+    document.getElementById('ya-invierte-card').classList.add('visible');
+    // inicializar calculadora camino B con edad guardada
+    const edad=parseFloat(load('femi_d4_edad'))||27;
+    document.getElementById('age-slider-ya').value=edad;
+    actualizarCalc('ya',edad);
+  }
 }
 
-function marcarXTB(){
-  save('femi_d5_xtb_click','1');
+function marcarXTB(){save('femi_d5_xtb_click','1');}
+
+/* CALCULADORA ETF */
+const ETF_DATA={
+  low:[
+    {ticker:'AGG',name:'iShares Core US Aggregate Bond',desc:'Bonos del tesoro americano. La inversión más estable del mercado.',risk:'bajo'},
+    {ticker:'BND',name:'Vanguard Total Bond Market',desc:'Mercado de bonos diversificado, ideal para proteger capital.',risk:'bajo'},
+    {ticker:'SCHD',name:'Schwab US Dividend Equity',desc:'Empresas grandes que pagan dividendos estables cada trimestre.',risk:'bajo'},
+  ],
+  medium:[
+    {ticker:'VOO',name:'Vanguard S&P 500',desc:'Las 500 empresas más grandes de EE.UU. en un solo activo.',risk:'moderado'},
+    {ticker:'VTI',name:'Vanguard Total Stock Market',desc:'Todo el mercado americano. La máxima diversificación.',risk:'moderado'},
+    {ticker:'VEA',name:'Vanguard Developed Markets',desc:'Europa, Japón y mercados desarrollados fuera de EE.UU.',risk:'moderado'},
+  ],
+  high:[
+    {ticker:'QQQ',name:'Invesco Nasdaq 100',desc:'Las 100 mayores empresas tecnológicas: Apple, Google, NVDA.',risk:'alto'},
+    {ticker:'VGT',name:'Vanguard Information Technology',desc:'Tecnología diversificada, menos volátil que fondos de innovación.',risk:'alto'},
+    {ticker:'SMH',name:'VanEck Semiconductors',desc:'Los chips que alimentan la inteligencia artificial.',risk:'alto'},
+  ],
+};
+const FEM_ETFS=[
+  {ticker:'SHE',name:'SPDR SSGA Gender Diversity',desc:'Empresas americanas con alta representación de mujeres en liderazgo.',risk:'moderado'},
+  {ticker:'ESGU',name:'iShares MSCI USA ESG Optimized',desc:'Empresas con altas calificaciones ambientales, sociales y de gobernanza.',risk:'moderado'},
+];
+const PROFILES={
+  aggressive:{label:'Perfil agresivo \ud83d\udd25',bg:'#C2CBFF',color:'#3D3F8A',high:75,med:18,low:7},
+  modHigh:{label:'Perfil moderado-agresivo',bg:'#F7C175',color:'#7A4E10',high:55,med:30,low:15},
+  moderate:{label:'Perfil moderado \u2696\ufe0f',bg:'#DFF3AF',color:'#3A6010',high:35,med:40,low:25},
+  conservative:{label:'Perfil conservador \ud83d\udee1\ufe0f',bg:'#FFEAD2',color:'#B55A20',high:15,med:40,low:45},
+};
+function getProfile(age){
+  const rec=Math.min(110-parseInt(age),90);
+  if(rec>=75)return{...PROFILES.aggressive,rec};
+  if(rec>=62)return{...PROFILES.modHigh,rec};
+  if(rec>=50)return{...PROFILES.moderate,rec};
+  return{...PROFILES.conservative,rec};
+}
+function etfMini(etf,fem){
+  const tagClass=fem?'tag-fem':(etf.risk==='alto'?'tag-high':etf.risk==='moderado'?'tag-mod':'tag-low');
+  const tagLabel=fem?'con prop\u00f3sito \ud83d\udc9c':(etf.risk+' riesgo');
+  return`<div class="etf-mini${fem?' fem':''}">
+    <div class="etf-ticker-wrap"><span class="etf-ticker">${etf.ticker}</span><span class="etf-ticker-hint">\u2190 b\u00fascalo as\u00ed</span></div>
+    <div class="etf-name">${etf.name}</div>
+    <div class="etf-desc-mini">${etf.desc}</div>
+    <div class="etf-tags"><span class="etf-tag ${tagClass}">${tagLabel}</span></div>
+  </div>`;
+}
+function actualizarCalc(camino,age){
+  age=parseInt(age);
+  document.getElementById('age-out-'+camino).textContent=age;
+  const p=getProfile(age);
+  const badge=document.getElementById('calc-perfil-badge-'+camino);
+  badge.textContent=p.label;badge.style.background=p.bg;badge.style.color=p.color;
+  document.getElementById('calc-alloc-'+camino).innerHTML=`
+    <div class="alloc-box" style="background:var(--crema)"><div class="alloc-pct" style="color:#B55A20">${p.high}%</div><div class="alloc-lbl" style="color:#B55A20">Alto riesgo</div></div>
+    <div class="alloc-box" style="background:#FEF7E0"><div class="alloc-pct" style="color:#9A6B10">${p.med}%</div><div class="alloc-lbl" style="color:#9A6B10">Moderado</div></div>
+    <div class="alloc-box" style="background:#EEE8FF"><div class="alloc-pct" style="color:var(--azul)">${p.low}%</div><div class="alloc-lbl" style="color:var(--azul)">Bajo riesgo</div></div>`;
+  let etfs=[];
+  if(p.rec>=75) etfs=[...ETF_DATA.high.slice(0,2),...ETF_DATA.medium.slice(0,2)];
+  else if(p.rec>=62) etfs=[...ETF_DATA.high.slice(0,1),...ETF_DATA.medium.slice(0,2),...ETF_DATA.low.slice(0,1)];
+  else if(p.rec>=50) etfs=[...ETF_DATA.medium.slice(0,2),...ETF_DATA.low.slice(0,2)];
+  else etfs=[...ETF_DATA.medium.slice(0,1),...ETF_DATA.low.slice(0,3)];
+  document.getElementById('calc-etfs-'+camino).innerHTML=etfs.map(e=>etfMini(e,false)).join('');
+  document.getElementById('calc-fem-etfs-'+camino).innerHTML=FEM_ETFS.map(e=>etfMini(e,true)).join('');
+}
+function toggleCalc(camino){
+  if(camino==='nueva'){
+    calcVisibleNueva=!calcVisibleNueva;
+    const embed=document.getElementById('calc-embed-nueva');
+    const btn=document.getElementById('btn-calc-toggle-nueva');
+    if(calcVisibleNueva){
+      embed.classList.add('visible');btn.textContent='\u2715 Cerrar guía de inversiones';
+      const edad=parseFloat(load('femi_d4_edad'))||27;
+      document.getElementById('age-slider-nueva').value=edad;actualizarCalc('nueva',edad);
+    } else {embed.classList.remove('visible');btn.textContent='\ud83d\udcca Ver en qué invertir según mi edad';}
+  } else {
+    calcVisibleYa=!calcVisibleYa;
+    const embed=document.getElementById('calc-embed-ya');
+    const btn=document.getElementById('btn-calc-toggle-ya');
+    if(calcVisibleYa){
+      embed.classList.add('visible');btn.textContent='\u2715 Cerrar guía de inversiones';
+    } else {embed.classList.remove('visible');btn.textContent='\ud83d\udcca Ver ETFs recomendados para mi perfil';}
+  }
 }
 
+/* SCREENSHOT */
+function mostrarScreenshot(camino,input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const preview=document.getElementById('screenshot-preview-'+camino);
+    preview.src=e.target.result;preview.style.display='block';
+    document.getElementById('screenshot-zone-'+camino).classList.add('has-img');
+    document.getElementById('ss-label-'+camino).textContent='\ud83d\udcf8 \u00a1Listo! Tu registro guardado.';
+    document.getElementById('ss-hint-'+camino).textContent='Un día lo vas a mirar con orgullo. \ud83d\udc9c';
+    document.getElementById('ss-hint-'+camino).style.color='var(--verde)';
+    screenshotSubido=true;save('femi_d5_screenshot','1');
+    if(camino==='ya'){
+      const checked=document.querySelectorAll('#opciones input[type=checkbox]:checked').length;
+      if(checked>0) document.getElementById('btn-confirm-ya').style.display='block';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+/* CONFIRMACIÓN */
 function confirmarAccion(tipo){
+  if(!screenshotSubido&&load('femi_d5_screenshot')!=='1'){
+    const zonaId='screenshot-zone-'+(tipo==='xtb'?'nueva':'ya');
+    const zona=document.getElementById(zonaId);
+    zona.classList.add('required-pulse');
+    zona.scrollIntoView({behavior:'smooth',block:'center'});
+    const hintId='ss-hint-'+(tipo==='xtb'?'nueva':'ya');
+    document.getElementById(hintId).textContent='\u26a0\ufe0f Sube tu foto primero para continuar';
+    document.getElementById(hintId).style.color='var(--rojo)';
+    setTimeout(()=>zona.classList.remove('required-pulse'),2500);
+    return;
+  }
   save('femi_d5_accion',tipo);
-  document.getElementById('reflexion-card').style.display='block';
-  document.getElementById('manana-card').style.display='block';
+  const rc=document.getElementById('reflexion-card');
+  const mc=document.getElementById('manana-card');
+  if(rc)rc.style.display='block';if(mc)mc.style.display='block';
   if(tipo==='xtb'){
-    document.getElementById('btn-confirm-xtb').textContent='✓ ¡Cuenta abierta!';
-    document.getElementById('btn-confirm-xtb').classList.add('saved');
+    const btn=document.getElementById('btn-confirm-xtb');
+    btn.textContent='\u2713 \u00a1Cuenta abierta!';btn.classList.add('saved');
   } else {
     document.getElementById('confirm-ya').classList.add('visible');
     document.getElementById('btn-confirm-ya').style.display='none';
   }
-  document.getElementById('reflexion-card').scrollIntoView({behavior:'smooth',block:'start'});
+  if(rc)rc.scrollIntoView({behavior:'smooth',block:'start'});
 }
-
 function checkOpcion(){
   const checked=document.querySelectorAll('#opciones input[type=checkbox]:checked').length;
   const btn=document.getElementById('btn-confirm-ya');
   if(checked>0){
-    btn.style.display='block';
     document.getElementById('confirm-ya').classList.add('visible');
+    if(screenshotSubido||load('femi_d5_screenshot')==='1') btn.style.display='block';
+    else {
+      const hint=document.getElementById('ss-hint-ya');
+      if(hint) hint.textContent='\ud83d\udcf8 Sube tu foto para poder confirmar';
+    }
   }
 }
 
+/* GUARDAR */
 function guardarTexto(){save('femi_d5_reflexion',document.getElementById('reflection').value);}
-
 function copiarMensaje(){
   const txt=document.getElementById('wa-msg').textContent;
-  navigator.clipboard.writeText(txt).then(()=>{
-    document.getElementById('copy-btn').textContent='✅ ¡Copiado! Ahora pégalo en el grupo';
-  }).catch(()=>{
-    const r=document.createRange();r.selectNode(document.getElementById('wa-msg'));
-    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
-    document.execCommand('copy');
-    document.getElementById('copy-btn').textContent='✅ ¡Copiado!';
-  });
+  navigator.clipboard.writeText(txt).then(()=>{document.getElementById('copy-btn').textContent='\u2705 \u00a1Copiado! Ahora pégalo en el grupo';})
+  .catch(()=>{const r=document.createRange();r.selectNode(document.getElementById('wa-msg'));window.getSelection().removeAllRanges();window.getSelection().addRange(r);document.execCommand('copy');document.getElementById('copy-btn').textContent='\u2705 \u00a1Copiado!';});
 }
-
 function guardar(){
   const btn=document.getElementById('save-btn');
   if(!load('femi_d5_accion')){
-    btn.textContent='Primero confirma la acción que tomaste ↑';
+    btn.textContent='Primero confirma la acción que tomaste \u2191';
     btn.style.background='#b07040';
-    setTimeout(()=>{btn.textContent='✓ Completar el Día 5 y ganar mi punto';btn.style.background='';},2200);
+    setTimeout(()=>{btn.textContent='\u2713 Completar el Día 5 y ganar mi punto';btn.style.background='';},2200);
     return;
   }
   save('femi_d5_listo','1');
   save('femi_d5_accion_texto',document.getElementById('reflection').value);
-  btn.textContent='✓ ¡Día 5 completado! +1 punto';
-  btn.classList.add('saved');
+  btn.textContent='\u2713 \u00a1Día 5 completado! +1 punto';btn.classList.add('saved');
   actualizarProgreso();
   const nombre=load('femi_nombre')||'';
-  document.getElementById('cel-title').textContent='¡Lo hiciste'+(nombre?', '+nombre:'')+'!\nHoy pasaste del "voy a hacerlo" al "lo hice".';
-  document.getElementById('celebracion').classList.add('visible');
-  document.getElementById('celebracion').scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('cel-title').textContent='\u00a1Lo hiciste'+(nombre?', '+nombre:'')+'!';
+  const cel=document.getElementById('celebracion');
+  cel.classList.add('visible');cel.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
+/* LOAD */
 window.addEventListener('load',()=>{
   actualizarProgreso();
-  const tipo=load('femi_d5_tipo');
+  mostrarConexionD4();
+  if(load('femi_d5_screenshot')==='1') screenshotSubido=true;
   const r=load('femi_d5_reflexion');
   if(r) document.getElementById('reflection').value=r;
+  const tipo=load('femi_d5_tipo');
   if(tipo) seleccionar(tipo);
   if(load('femi_d5_accion')){
-    document.getElementById('reflexion-card').style.display='block';
-    document.getElementById('manana-card').style.display='block';
+    const rc=document.getElementById('reflexion-card');const mc=document.getElementById('manana-card');
+    if(rc)rc.style.display='block';if(mc)mc.style.display='block';
+    if(load('femi_d5_accion')==='xtb'){
+      const btn=document.getElementById('btn-confirm-xtb');
+      if(btn){btn.textContent='\u2713 \u00a1Cuenta abierta!';btn.classList.add('saved');}
+    }
   }
   if(load('femi_d5_listo')==='1'){
     const btn=document.getElementById('save-btn');
-    btn.textContent='✓ ¡Día 5 completado! +1 punto';
-    btn.classList.add('saved');
+    btn.textContent='\u2713 \u00a1Día 5 completado! +1 punto';btn.classList.add('saved');
     const nombre=load('femi_nombre')||'';
-    document.getElementById('cel-title').textContent='¡Lo hiciste'+(nombre?', '+nombre:'')+'!\nHoy pasaste del "voy a hacerlo" al "lo hice".';
+    document.getElementById('cel-title').textContent='\u00a1Lo hiciste'+(nombre?', '+nombre:'')+'!';
     document.getElementById('celebracion').classList.add('visible');
   }
 });
