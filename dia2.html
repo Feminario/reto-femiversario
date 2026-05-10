@@ -253,12 +253,14 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
       <div>
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
         <div class="msg-box" id="wa-msg">Hice el Día 2 del Reto Feminversario 🕐
+<span id="wa-nombre2" style="display:none"></span>
 
-Descubrí cuánto vale mi hora de vida — y hay gastos que me cuestan horas que no vuelven.
+Mi hora de vida vale: <span id="wa-hora2">—</span>
+Con eso en mente, decidí reconsiderar: <span id="wa-cortar">ese gasto que no aporta</span>
 
-Hoy decidí reconsiderar: <span id="wa-cortar">ese gasto que no vale</span>.
+Cuando sabes el precio real de tu tiempo, las decisiones cambian.
 
-¿Cuál es el tuyo?
+¿Cuánto vale la tuya?
 #RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
       </div>
@@ -311,6 +313,29 @@ function fmtH(h){
 }
 function save(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
 function load(k){ try{return localStorage.getItem(k)||'';}catch(e){return '';} }
+
+const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
+const FORM_FIELDS = {
+  nombre:   'entry.501200423',
+  email:    'entry.237525753',
+  libertad: 'entry.932806817',
+  hora:     'entry.836164340',
+  potencial:'entry.741325246',
+  pension:  'entry.641892579',
+  fondo:    'entry.648858645',
+  perfil:   'entry.1876122600',
+};
+function enviarFormsData(extra){
+  try{
+    const vals={nombre:load('femi_nombre')||'',libertad:load('femi_d1_numero')||'',
+      hora:load('femi_d2_hora')||'',potencial:load('femi_d3_potencial')||'',
+      pension:load('femi_d4_pension')||'',fondo:load('femi_d6_meta')||'',perfil:extra||''};
+    const body=new URLSearchParams();
+    Object.entries(FORM_FIELDS).forEach(([k,entry])=>{if(vals[k])body.append(entry,vals[k]);});
+    fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
+  }catch(e){}
+}
+
 
 let valorHora = 0;
 
@@ -436,12 +461,15 @@ function guardar(){
     return;
   }
   save('femi_d2_listo','1');
+  enviarFormsData('dia2');
   btn.textContent='✓ ¡Día 2 completado! +1 punto';
   btn.classList.add('saved');
   actualizarProgreso();
   const nombre=load('femi_nombre')||'';
   const gc=document.getElementById('gasto-cortar');if(gc)save('femi_d2_cortar',gc.value||'');
-  const wa_c=document.getElementById('wa-cortar');if(wa_c)wa_c.textContent=load('femi_d2_cortar')||'ese gasto que no vale';
+  const wa_c=document.getElementById('wa-cortar');if(wa_c)wa_c.textContent=load('femi_d2_cortar')||'ese gasto que no aporta';
+  const wh2=document.getElementById('wa-hora2');const h2=parseFloat(load('femi_d2_hora'))||0;if(wh2&&h2)wh2.textContent='$ '+Math.round(h2).toLocaleString('es-CO');
+  const wn2=document.getElementById('wa-nombre2');if(wn2)wn2.textContent=load('femi_nombre')||'';
   document.getElementById('cel-title').textContent='¡Ya sabes cuánto vale tu tiempo'+(nombre?', '+nombre:'')+'!';
   const cel=document.getElementById('celebracion');
   cel.classList.add('visible');
