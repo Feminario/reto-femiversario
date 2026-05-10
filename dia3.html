@@ -256,11 +256,11 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
         <div class="msg-box" id="wa-msg">Hice el Día 3 del Reto Feminversario 💼
 
-Calculé cuánto voy a generar con mi trabajo en toda mi vida.
+Mi potencial económico a lo largo de toda mi vida laboral es: <span id="wa-potencial">—</span> 🤯
 
-Mi potencial económico es: <span id="wa-potencial">—</span> 🤯
+Ese número nunca me lo había calculado nadie. Ahora lo sé — y cambia cómo me veo a mí misma.
 
-Nunca me lo habían dicho así. ¿Ya hiciste el tuyo?
+¿Ya lo calculaste?
 #RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
       </div>
@@ -310,6 +310,28 @@ function fmt(n){
 function fmtFull(n){ return '$\u00a0'+Math.round(n).toLocaleString('es-CO'); }
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+
+const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
+const FORM_FIELDS = {
+  nombre:   'entry.501200423',
+  email:    'entry.237525753',
+  libertad: 'entry.932806817',
+  hora:     'entry.836164340',
+  potencial:'entry.741325246',
+  pension:  'entry.641892579',
+  fondo:    'entry.648858645',
+  perfil:   'entry.1876122600',
+};
+function enviarFormsData(extra){
+  try{
+    const vals={nombre:load('femi_nombre')||'',libertad:load('femi_d1_numero')||'',
+      hora:load('femi_d2_hora')||'',potencial:load('femi_d3_potencial')||'',
+      pension:load('femi_d4_pension')||'',fondo:load('femi_d6_meta')||'',perfil:extra||''};
+    const body=new URLSearchParams();
+    Object.entries(FORM_FIELDS).forEach(([k,entry])=>{if(vals[k])body.append(entry,vals[k]);});
+    fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
+  }catch(e){}
+}
 
 function actualizarProgreso(){
   const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
@@ -402,6 +424,7 @@ function guardar(){
     return;
   }
   save('femi_d3_listo','1');
+  enviarFormsData('dia3');
   btn.textContent='✓ ¡Día 3 completado! +1 punto';
   btn.classList.add('saved');
   actualizarProgreso();
