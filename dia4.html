@@ -332,11 +332,14 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
         <div class="msg-box" id="wa-msg">Hice el Día 4 del Reto Feminversario 📊
 
-Vi el hueco real entre mi pensión estimada y lo que necesito para vivir.
+Hoy vi el hueco entre lo que recibiría de pensión y lo que realmente necesito para vivir.
 
-Mi brecha pensional mensual es: <span id="wa-brecha">—</span> 😶
+Mi brecha pensional mensual: <span id="wa-brecha">—</span> 😶
+Mi número de la libertad: <span id="wa-libertad4">—</span>/mes
 
-Esta semana empecé a hacer algo al respecto. ¿Ya lo calculaste?
+Este número existe. Ignorarlo no lo hace desaparecer. Pero ya lo sé — y eso cambia todo.
+
+¿Ya lo calculaste?
 #RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
       </div>
@@ -382,6 +385,28 @@ let tipoFondo = '';
 function fmt(n){return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+
+const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
+const FORM_FIELDS = {
+  nombre:   'entry.501200423',
+  email:    'entry.237525753',
+  libertad: 'entry.932806817',
+  hora:     'entry.836164340',
+  potencial:'entry.741325246',
+  pension:  'entry.641892579',
+  fondo:    'entry.648858645',
+  perfil:   'entry.1876122600',
+};
+function enviarFormsData(extra){
+  try{
+    const vals={nombre:load('femi_nombre')||'',libertad:load('femi_d1_numero')||'',
+      hora:load('femi_d2_hora')||'',potencial:load('femi_d3_potencial')||'',
+      pension:load('femi_d4_pension')||'',fondo:load('femi_d6_meta')||'',perfil:extra||''};
+    const body=new URLSearchParams();
+    Object.entries(FORM_FIELDS).forEach(([k,entry])=>{if(vals[k])body.append(entry,vals[k]);});
+    fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
+  }catch(e){}
+}
 
 function actualizarProgreso(){
   const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
@@ -455,6 +480,7 @@ function calcularBrecha(){
     save('femi_d4_sal', sal);
   }
 
+  const wa_l4=document.getElementById('wa-libertad4');if(wa_l4){const l4=parseFloat(load('femi_d1_numero'))||0;if(l4)wa_l4.textContent='$ '+Math.round(l4).toLocaleString('es-CO');}
   const wa_b=document.getElementById('wa-brecha');const lib4=parseFloat(load('femi_d1_numero'))||0;if(wa_b)wa_b.textContent=lib4>0?'$\u00a0'+Math.round(Math.max(lib4-pensionEstimada,0)).toLocaleString('es-CO')+'/mes':'calcúlalo tú también';
   save('femi_d4_pension', pensionEstimada);
   mostrarBrecha(pensionEstimada, libertad);
@@ -511,6 +537,7 @@ function guardar(){
     return;
   }
   save('femi_d4_listo','1');
+  enviarFormsData('dia4');
   btn.textContent='✓ ¡Día 4 completado! +1 punto';
   btn.classList.add('saved');
   actualizarProgreso();
