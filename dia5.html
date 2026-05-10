@@ -410,15 +410,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     <div class="wa-steps">
       <div>
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
-        <div class="msg-box" id="wa-msg">Lo hice ⚡
+        <div class="msg-box" id="wa-msg">¡Lo hice! ⚡ — Día 5 completado
 
-Completé el Día 5 del Reto Feminversario y tomé una acción financiera real hoy.
+Hoy no reflexioné. Hice.
 
-Mi acción de hoy: <span id="wa-accion5">tomé mi primera acción</span> 📲
+Mi acción financiera real de hoy: <span id="wa-accion5">tomé mi primera acción</span> 📲
 
-El miedo no se va esperando. Se va haciendo.
+El miedo no se va esperando. Se va haciendo. ¿Ya lo hiciste tú?
 
-¿Ya lo hiciste tú? ¡Comparte una foto de tu cuenta abierta! 📸
+Si abriste cuenta nueva, adjunta tu captura — tu primer paso puede ser el empujón que otra necesita 📸
 #RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
       <div style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px;font-size:12px;color:#2d5a1a;font-weight:600;">
@@ -464,6 +464,28 @@ El miedo no se va esperando. Se va haciendo.
 <script>
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+
+const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
+const FORM_FIELDS = {
+  nombre:   'entry.501200423',
+  email:    'entry.237525753',
+  libertad: 'entry.932806817',
+  hora:     'entry.836164340',
+  potencial:'entry.741325246',
+  pension:  'entry.641892579',
+  fondo:    'entry.648858645',
+  perfil:   'entry.1876122600',
+};
+function enviarFormsData(extra){
+  try{
+    const vals={nombre:load('femi_nombre')||'',libertad:load('femi_d1_numero')||'',
+      hora:load('femi_d2_hora')||'',potencial:load('femi_d3_potencial')||'',
+      pension:load('femi_d4_pension')||'',fondo:load('femi_d6_meta')||'',perfil:extra||''};
+    const body=new URLSearchParams();
+    Object.entries(FORM_FIELDS).forEach(([k,entry])=>{if(vals[k])body.append(entry,vals[k]);});
+    fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
+  }catch(e){}
+}
 function fmt(n){return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
 let situacion='';
 let screenshotSubido=false;
@@ -741,8 +763,11 @@ function guardar(){
     },2500);
     return;
   }
-  const waA=document.getElementById('wa-accion5');const refTxt=document.getElementById('reflection');if(waA&&refTxt&&refTxt.value)waA.textContent=refTxt.value.substring(0,60)+(refTxt.value.length>60?'...':'');
+  const refTxt5=document.getElementById('reflection');const accion5=refTxt5?refTxt5.value:'';
+  save('femi_d5_accion', accion5.substring(0,120));
+  const waA=document.getElementById('wa-accion5');if(waA)waA.textContent=accion5?accion5.substring(0,60)+(accion5.length>60?'...':''):'tomé mi primera acción';
   save('femi_d5_listo','1');
+  enviarFormsData('dia5');
   save('femi_d5_accion_texto',document.getElementById('reflection').value);
   btn.textContent='\u2713 \u00a1Día 5 completado! +1 punto';btn.classList.add('saved');
   actualizarProgreso();
