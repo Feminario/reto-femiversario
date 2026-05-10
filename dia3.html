@@ -109,6 +109,18 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
 .dot.done{background:var(--azul);}
 .dot.active{background:var(--azul);width:20px;border-radius:3px;}
 .nav-label{font-size:11px;color:var(--muted);font-weight:500;}
+
+.challenge-done{margin-top:16px;}
+.cd-inner{background:linear-gradient(135deg,#2D1B4E 0%,#6B4B8A 100%);border-radius:20px;padding:24px;text-align:center;color:white;}
+.cd-check{font-size:40px;margin-bottom:8px;}
+.cd-title{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--dorado,#F7C175);}
+.cd-sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:14px;}
+.cd-tomorrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 16px;margin-bottom:12px;font-size:13px;font-weight:600;}
+.cd-clock{font-size:18px;}
+.cd-teaser{font-size:12px;color:rgba(255,255,255,.75);font-style:italic;line-height:1.6;border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:4px;}
+.club-hint{display:flex;align-items:flex-start;gap:8px;background:var(--lila-l,#F9E1FF);border-left:3px solid var(--lila,#CEA2DD);border-radius:0 10px 10px 0;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--muted,#6B6080);line-height:1.7;font-style:italic;}
+.club-hint-icon{flex-shrink:0;font-size:15px;}
+
 </style>
 </head>
 <body>
@@ -228,6 +240,8 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
     <div class="card-label">Tu reflexión del día</div>
     <div class="card-title">¿Qué sientes cuando ves ese número?</div>
     <p class="card-body">¿Te parece más grande o más pequeño de lo que esperabas? ¿Cambia algo en la forma en que piensas en tu carrera o tus decisiones financieras?</p>
+
+  <div class="club-hint"><span class="club-hint-icon">💜</span><span>Una de las cosas que más nos gusta hacer en el Club 365 es conectar este número con decisiones reales de inversión. Ver tu potencial en números cambia cómo negocias, cómo decides, cómo te valoras.</span></div>
     <textarea class="reflection-area" id="reflection" placeholder="Escribe tu respuesta acá — nadie más la ve." oninput="guardarTexto()"></textarea>
     <button class="btn-primary" id="save-btn" onclick="guardar()">✓ Completar el Día 3 y ganar mi punto</button>
   </div>
@@ -242,9 +256,11 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
         <div class="msg-box" id="wa-msg">Hice el Día 3 del Reto Feminversario 💼
 
-Calculé cuánto voy a generar con mi trabajo en toda mi vida. El número es mucho más grande de lo que pensaba.
+Calculé cuánto voy a generar con mi trabajo en toda mi vida.
 
-¿Ya hiciste el tuyo?
+Mi potencial económico es: <span id="wa-potencial">—</span> 🤯
+
+Nunca me lo habían dicho así. ¿Ya hiciste el tuyo?
 #RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
       </div>
@@ -255,6 +271,15 @@ Calculé cuánto voy a generar con mi trabajo en toda mi vida. El número es muc
     </div>
   </div>
 
+  <div class="challenge-done" id="challenge-done" style="display:none;">
+    <div class="cd-inner">
+      <div class="cd-check">✅</div>
+      <div class="cd-title">¡Challenge completado!</div>
+      <div class="cd-sub">Día 3 de 7 — ¡lo lograste!</div>
+      <div class="cd-tomorrow"><span class="cd-clock">⏰</span><span>Nos vemos mañana a las <strong>7:00 AM</strong></span></div>
+      <div class="cd-teaser">📊 Mañana: Día 4 — El más importante del reto. Calculas el hueco entre lo que recibirías de pensión y lo que realmente necesitas para vivir. Spoiler: la brecha existe. Y hoy la mides.</div>
+    </div>
+  </div>
   <div class="card-menta" id="manana-card" style="display:none;">
     <div class="menta-label">Mañana · Día 4</div>
     <div class="card-title" style="font-size:15px;">El día más importante del reto.</div>
@@ -278,8 +303,8 @@ Calculé cuánto voy a generar con mi trabajo en toda mi vida. El número es muc
 
 <script>
 function fmt(n){
-  if(n>=1e9) return '$'+(n/1e9).toFixed(1).replace('.',',')+'B';
-  if(n>=1e6) return '$'+(n/1e6).toFixed(0).toLocaleString('es-CO')+'M';
+  if(n>=1e9) return '$\u00a0'+(n/1e9).toFixed(1).replace('.',',')+' billones';
+  if(n>=1e6) return '$\u00a0'+(n/1e6).toFixed(0).toLocaleString('es-CO')+' millones';
   return '$\u00a0'+Math.round(n).toLocaleString('es-CO');
 }
 function fmtFull(n){ return '$\u00a0'+Math.round(n).toLocaleString('es-CO'); }
@@ -384,7 +409,26 @@ function guardar(){
   document.getElementById('cel-title').textContent='¡Ahora sabes lo que vales'+(nombre?', '+nombre:'')+'!';
   const cel=document.getElementById('celebracion');
   cel.classList.add('visible');
+  const _bd=document.getElementById('challenge-done');if(_bd)_bd.style.display='block';
   cel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+
+function actualizarComparador(){
+  const pot = parseFloat(load('femi_d3_potencial'))||0;
+  const el = document.getElementById('comparador-d3');
+  const tx = document.getElementById('comp-texto');
+  if(!el||!tx||pot<=0) return;
+  el.style.display='block';
+  let txt = '';
+  if(pot >= 1e9) {
+    txt = `<strong>${(pot/1e9).toFixed(1).replace('.',',')} billones de pesos</strong> es aproximadamente lo que genera Shakira en toda su carrera musical — o el precio de unas 400 casas en Bogotá. Eso es lo que <em>tú</em> puedes producir con tu trabajo.`;
+  } else if(pot >= 5e8) {
+    txt = `<strong>${(pot/1e6).toFixed(0)} millones de pesos</strong> alcanzaría para viajar por el mundo más de <strong>${Math.round(pot/30e6)} años</strong> con todos los gastos pagados. Ese es el valor económico de tu vida laboral.`;
+  } else {
+    txt = `<strong>${(pot/1e6).toFixed(0)} millones de pesos</strong> — suficiente para más de <strong>${Math.round(pot/15e6)} viajes internacionales</strong> o para comprar <strong>${Math.round(pot/250e6)} apartamentos</strong>. Todo eso puede generar tu trabajo.`;
+  }
+  tx.innerHTML = txt;
 }
 
 window.addEventListener('load',()=>{
