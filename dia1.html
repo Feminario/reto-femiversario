@@ -141,6 +141,18 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
 .dot { width:6px; height:6px; border-radius:50%; background:var(--border); }
 .dot.active { background:var(--azul); width:20px; border-radius:3px; }
 .nav-label { font-size:11px; color:var(--muted); font-weight:500; }
+
+.challenge-done{margin-top:16px;}
+.cd-inner{background:linear-gradient(135deg,#2D1B4E 0%,#6B4B8A 100%);border-radius:20px;padding:24px;text-align:center;color:white;}
+.cd-check{font-size:40px;margin-bottom:8px;}
+.cd-title{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--dorado,#F7C175);}
+.cd-sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:14px;}
+.cd-tomorrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 16px;margin-bottom:12px;font-size:13px;font-weight:600;}
+.cd-clock{font-size:18px;}
+.cd-teaser{font-size:12px;color:rgba(255,255,255,.75);font-style:italic;line-height:1.6;border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:4px;}
+.club-hint{display:flex;align-items:flex-start;gap:8px;background:var(--lila-l,#F9E1FF);border-left:3px solid var(--lila,#CEA2DD);border-radius:0 10px 10px 0;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--muted,#6B6080);line-height:1.7;font-style:italic;}
+.club-hint-icon{flex-shrink:0;font-size:15px;}
+
 </style>
 </head>
 <body>
@@ -205,6 +217,17 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
       <div class="result-label">Tu número de la libertad</div>
       <div class="result-amount" id="result-amount"><span class="result-empty">Llena las categorías, aparece acá</span></div>
       <div class="result-desc" id="result-desc" style="display:none">al mes · Este es tu norte durante toda la semana</div>
+    
+    <!-- PROYECCIÓN INVERSIÓN -->
+    <div id="proyeccion-inv" style="display:none;margin-top:14px;">
+      <div style="background:linear-gradient(135deg,var(--crema) 0%,var(--lila-l) 100%);border:1.5px solid var(--lila);border-radius:14px;padding:18px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul);margin-bottom:8px;">✨ ¿Y si empezaras a invertir hoy?</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;">Invirtiendo solo el <strong>10% de tu número</strong> cada mes, al 8% anual, en <strong id="proy-anos">20 años</strong> habrías acumulado:</p>
+        <div style="text-align:center;font-size:34px;font-weight:800;color:var(--azul);margin:6px 0;" id="proy-total">—</div>
+        <p style="font-size:11px;color:var(--muted);text-align:center;">suficiente para generar <strong id="proy-renta">—</strong>/mes en renta sin tocar el capital.</p>
+        <p style="font-size:11px;color:var(--azul);font-weight:600;text-align:center;margin-top:8px;">Esto es exactamente lo que construimos en el Club 365 — paso a paso, mes a mes.</p>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -212,6 +235,8 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
     <div class="card-label">Tu reflexión del día</div>
     <div class="card-title">Una pregunta, una respuesta honesta</div>
     <p class="card-body">¿Qué te sorprendió más de tu número? ¿Es más alto de lo que pensabas, más bajo, o exactamente lo que esperabas?</p>
+
+  <div class="club-hint"><span class="club-hint-icon">💜</span><span>En el Club 365 trabajamos exactamente este número — y construimos el camino para alcanzarlo juntas, mes a mes. Si ya lo tienes claro, ya tienes lo más importante.</span></div>
     <textarea class="reflection-area" id="reflection" placeholder="Escribe tu respuesta acá — nadie más la ve. Esto es para ti." oninput="guardarTexto()"></textarea>
     <button class="btn-primary" id="save-btn" onclick="guardar()">✓ Completar el Día 1 y ganar mi punto</button>
   </div>
@@ -240,7 +265,17 @@ Ya sé cuánto necesito al mes para vivir la vida que quiero. Es más revelador 
         </a>
       </div>
     </div>
+  
+  <div class="challenge-done" id="challenge-done" style="display:none;">
+    <div class="cd-inner">
+      <div class="cd-check">✅</div>
+      <div class="cd-title">¡Challenge completado!</div>
+      <div class="cd-sub">Día 1 de 7 — ¡lo lograste!</div>
+      <div class="cd-tomorrow"><span class="cd-clock">⏰</span><span>Nos vemos mañana a las <strong>7:00 AM</strong></span></div>
+      <div class="cd-teaser">🕐 Mañana: Día 2 — ¿Cuánto vale tu hora de vida? Spoiler: cada café, cada suscripción, te va a costar en un número que no habías visto antes.</div>
+    </div>
   </div>
+</div>
 
   <div class="card-menta">
     <div class="menta-label">Mañana · Día 2</div>
@@ -330,7 +365,22 @@ function guardar(){
   const cel=document.getElementById('celebracion');
   document.getElementById('cel-title').textContent='¡Lo hiciste'+(nombre?', '+nombre:'')+'!';
   cel.classList.add('visible');
+  const _bd=document.getElementById('challenge-done');if(_bd)_bd.style.display='block';
   cel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+
+function calcularProyeccion(total) {
+  if(!total||total<=0) return;
+  const aporte = total * 0.10;
+  const r = 0.08/12; const n = 20*12;
+  const futuro = aporte * ((Math.pow(1+r,n)-1)/r);
+  const renta = futuro * 0.04 / 12;
+  document.getElementById('proyeccion-inv').style.display='block';
+  document.getElementById('proy-total').textContent = '$\u00a0'+Math.round(futuro).toLocaleString('es-CO');
+  document.getElementById('proy-renta').textContent = '$\u00a0'+Math.round(renta).toLocaleString('es-CO');
+  document.getElementById('proy-anos').textContent = '20 años';
+  document.getElementById('wa-libertad').textContent = '$\u00a0'+Math.round(total).toLocaleString('es-CO');
 }
 
 window.addEventListener('load',()=>{
