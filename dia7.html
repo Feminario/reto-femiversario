@@ -308,7 +308,29 @@ Ahora s&eacute; a d&oacute;nde voy. &#128200;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
-function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+function load(k){try{return localStorage.getItem(k)||'';}
+
+const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
+const FORM_FIELDS = {
+  nombre:   'entry.501200423',
+  email:    'entry.237525753',
+  libertad: 'entry.932806817',
+  hora:     'entry.836164340',
+  potencial:'entry.741325246',
+  pension:  'entry.641892579',
+  fondo:    'entry.648858645',
+  perfil:   'entry.1876122600',
+};
+function enviarFormsData(extra){
+  try{
+    const vals={nombre:load('femi_nombre')||'',libertad:load('femi_d1_numero')||'',
+      hora:load('femi_d2_hora')||'',potencial:load('femi_d3_potencial')||'',
+      pension:load('femi_d4_pension')||'',fondo:load('femi_d6_meta')||'',perfil:extra||''};
+    const body=new URLSearchParams();
+    Object.entries(FORM_FIELDS).forEach(([k,entry])=>{if(vals[k])body.append(entry,vals[k]);});
+    fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
+  }catch(e){}
+}catch(e){return '';}}
 function fmt(n){if(!n||isNaN(n))return '\u2014';return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
 function fmtC(n){if(!n||isNaN(n))return '\u2014';if(n>=1e9)return '$\u00a0'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return '$\u00a0'+(n/1e6).toFixed(1)+'M';return fmt(n);}
 
@@ -868,6 +890,7 @@ function copiarMensaje(){
 function guardar(){
   const btn=document.getElementById('save-btn');
   save('femi_d7_listo','1');
+  enviarFormsData(load('femi_d7_perfil')||'dia7');
   try{ enviarAGoogleForms(cargarDatos()); }catch(e){}
   save('femi_d7_reflexion_texto',document.getElementById('reflection').value);
   btn.textContent='\u2713 \u00a1Reto completado! 7/7 \u2b50';
@@ -888,14 +911,14 @@ function enviarAGoogleForms(d){
   // REEMPLAZAR los entry.XXXXXXX con los IDs reales de tu formulario
   // Para obtenerlos: abre el form → click derecho → Ver código fuente → busca "entry."
   const body = new URLSearchParams({
-    'entry.NOMBRE_ID': d.nombre||'',
-    'entry.EMAIL_ID': '',
-    'entry.LIBERTAD_ID': d.libertad||'',
-    'entry.HORA_ID': d.hora||'',
-    'entry.POTENCIAL_ID': d.potencial||'',
-    'entry.PENSION_ID': d.pension||'',
-    'entry.FONDO_ID': d.d6_meta||'',
-    'entry.PERFIL_ID': calcularPerfil(d)||'',
+    'entry.501200423': d.nombre||'',
+    'entry.237525753': '',
+    'entry.932806817': d.libertad||'',
+    'entry.836164340': d.hora||'',
+    'entry.741325246': d.potencial||'',
+    'entry.641892579': d.pension||'',
+    'entry.648858645': d.d6_meta||'',
+    'entry.1876122600': calcularPerfil(d)||'',
   });
   fetch(URL, {method:'POST', mode:'no-cors', body}).catch(()=>{});
 }
