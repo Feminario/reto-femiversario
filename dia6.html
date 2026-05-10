@@ -434,13 +434,13 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
     <div class="wa-steps">
       <div>
         <div class="wa-step-label">Paso 1 &middot; Copia este mensaje</div>
-        <div class="msg-box" id="wa-msg">Hice el D&iacute;a 6 del Reto Feminversario &#128737;&#65039;
+        <div class="msg-box" id="wa-msg">Hice el Día 6 del Reto Feminversario 🛡️
 
-Hoy calcul&eacute; mi fondo de emergencia ideal y eleg&iacute; un paso concreto para construirlo.
+Calculé mi fondo de autonomía: <span id="wa-fondo6">—</span>
 
-Ya s&eacute; cu&aacute;nto necesito. Ahora s&eacute; c&oacute;mo llegar.
+Ese es el colchón que me da libertad real para tomar decisiones sin miedo. Invertir sin este fondo es construir sobre arena.
 
-Ma&ntilde;ana es el &uacute;ltimo d&iacute;a del reto &#128293;
+Mañana es el último día — y hay sorpresa de aniversario 🎂
 #RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">&#128203; Copiar mensaje</button>
       </div>
@@ -483,6 +483,28 @@ Ma&ntilde;ana es el &uacute;ltimo d&iacute;a del reto &#128293;
 <script>
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+
+const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
+const FORM_FIELDS = {
+  nombre:   'entry.501200423',
+  email:    'entry.237525753',
+  libertad: 'entry.932806817',
+  hora:     'entry.836164340',
+  potencial:'entry.741325246',
+  pension:  'entry.641892579',
+  fondo:    'entry.648858645',
+  perfil:   'entry.1876122600',
+};
+function enviarFormsData(extra){
+  try{
+    const vals={nombre:load('femi_nombre')||'',libertad:load('femi_d1_numero')||'',
+      hora:load('femi_d2_hora')||'',potencial:load('femi_d3_potencial')||'',
+      pension:load('femi_d4_pension')||'',fondo:load('femi_d6_meta')||'',perfil:extra||''};
+    const body=new URLSearchParams();
+    Object.entries(FORM_FIELDS).forEach(([k,entry])=>{if(vals[k])body.append(entry,vals[k]);});
+    fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
+  }catch(e){}
+}
 function fmt(n){return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
 function fmtC(n){if(n>=1e6)return '$\u00a0'+(n/1e6).toFixed(1)+'M';return fmt(n);}
 
@@ -704,6 +726,8 @@ function guardar(){
     return;
   }
   save('femi_d6_listo','1');
+  const wf6=document.getElementById('wa-fondo6');const fm6=parseFloat(load('femi_d6_meta'))||0;if(wf6&&fm6)wf6.textContent='$ '+Math.round(fm6).toLocaleString('es-CO');
+  enviarFormsData('dia6');
   save('femi_d6_reflexion_texto',document.getElementById('reflection').value);
   btn.textContent='\u2713 \u00a1D\u00eda 6 completado! +1 punto';
   btn.classList.add('saved');
