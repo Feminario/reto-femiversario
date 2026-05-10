@@ -129,6 +129,18 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
 .dot.active { background:var(--azul); width:20px; border-radius:3px; }
 .dot.done { background:var(--azul); }
 .nav-label { font-size:11px; color:var(--muted); font-weight:500; }
+
+.challenge-done{margin-top:16px;}
+.cd-inner{background:linear-gradient(135deg,#2D1B4E 0%,#6B4B8A 100%);border-radius:20px;padding:24px;text-align:center;color:white;}
+.cd-check{font-size:40px;margin-bottom:8px;}
+.cd-title{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--dorado,#F7C175);}
+.cd-sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:14px;}
+.cd-tomorrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 16px;margin-bottom:12px;font-size:13px;font-weight:600;}
+.cd-clock{font-size:18px;}
+.cd-teaser{font-size:12px;color:rgba(255,255,255,.75);font-style:italic;line-height:1.6;border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:4px;}
+.club-hint{display:flex;align-items:flex-start;gap:8px;background:var(--lila-l,#F9E1FF);border-left:3px solid var(--lila,#CEA2DD);border-radius:0 10px 10px 0;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--muted,#6B6080);line-height:1.7;font-style:italic;}
+.club-hint-icon{flex-shrink:0;font-size:15px;}
+
 </style>
 </head>
 <body>
@@ -204,7 +216,16 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
     <div class="conversor" id="conversor">
       <div class="conversor-title" style="margin-top:12px;">Nombre del gasto → Valor → Tu tiempo</div>
     </div>
-    <div class="conversor-hint">Prueba con: el arriendo, el café diario, streaming, ropa, salidas...</div>
+    
+      <!-- Pregunta especial Día 2 -->
+      <div style="margin-top:16px;background:var(--crema);border:1.5px solid var(--dorado);border-radius:12px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a5000;margin-bottom:6px;">🔍 Una pregunta más</div>
+        <p style="font-size:13px;color:var(--texto);font-weight:600;margin-bottom:8px;">¿Qué gasto sentiste que te cuesta muchas horas pero no te aporta nada real?</p>
+        <input type="text" id="gasto-cortar" placeholder="Ej: suscripción que olvidé cancelar, delivery cuando no lo necesitaba..." 
+          style="width:100%;background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--texto);" 
+          oninput="save('femi_d2_cortar',this.value)">
+      </div>
+      <div class="conversor-hint">Prueba con: el arriendo, el café diario, streaming, ropa, salidas...</div>
 
     <div class="insight-box" id="insight-box">
       <div class="insight-emoji">💡</div>
@@ -217,6 +238,8 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
     <div class="card-label">Tu reflexión del día</div>
     <div class="card-title">¿Qué gasto te sorprendió más?</div>
     <p class="card-body">Cuando lo ves en horas de vida en lugar de pesos, ¿qué se siente diferente? ¿Hay algo que valga más de lo que creías o menos?</p>
+
+  <div class="club-hint"><span class="club-hint-icon">💜</span><span>En el Club 365 hacemos este ejercicio colectivamente — porque las decisiones financieras son más fáciles cuando no las tomas sola. Si ya lo estás pensando, ya estás lista.</span></div>
     <textarea class="reflection-area" id="reflection" placeholder="Escribe acá tu respuesta — nadie más la ve." oninput="guardarTexto()"></textarea>
     <button class="btn-primary" id="save-btn" onclick="guardar()">✓ Completar el Día 2 y ganar mi punto</button>
   </div>
@@ -231,9 +254,11 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
         <div class="msg-box" id="wa-msg">Hice el Día 2 del Reto Feminversario 🕐
 
-Calculé cuánto vale mi hora de vida y ahora veo mis gastos completamente diferente.
+Descubrí cuánto vale mi hora de vida — y hay gastos que me cuestan horas que no vuelven.
 
-¿Ya hiciste el tuyo? 
+Hoy decidí reconsiderar: <span id="wa-cortar">ese gasto que no vale</span>.
+
+¿Cuál es el tuyo?
 #RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
       </div>
@@ -245,6 +270,15 @@ Calculé cuánto vale mi hora de vida y ahora veo mis gastos completamente difer
   </div>
 
   <!-- MAÑANA -->
+  <div class="challenge-done" id="challenge-done" style="display:none;">
+    <div class="cd-inner">
+      <div class="cd-check">✅</div>
+      <div class="cd-title">¡Challenge completado!</div>
+      <div class="cd-sub">Día 2 de 7 — ¡lo lograste!</div>
+      <div class="cd-tomorrow"><span class="cd-clock">⏰</span><span>Nos vemos mañana a las <strong>7:00 AM</strong></span></div>
+      <div class="cd-teaser">💼 Mañana: Día 3 — Vas a calcular algo que nunca te habían dicho: cuánto vas a generar con tu trabajo en toda tu vida. El número va a sorprenderte.</div>
+    </div>
+  </div>
   <div class="card-menta" id="manana-card" style="display:none;">
     <div class="menta-label">Mañana · Día 3</div>
     <div class="card-title" style="font-size:15px;">¿Cuánto vales como activo económico?</div>
@@ -406,9 +440,12 @@ function guardar(){
   btn.classList.add('saved');
   actualizarProgreso();
   const nombre=load('femi_nombre')||'';
+  const gc=document.getElementById('gasto-cortar');if(gc)save('femi_d2_cortar',gc.value||'');
+  const wa_c=document.getElementById('wa-cortar');if(wa_c)wa_c.textContent=load('femi_d2_cortar')||'ese gasto que no vale';
   document.getElementById('cel-title').textContent='¡Ya sabes cuánto vale tu tiempo'+(nombre?', '+nombre:'')+'!';
   const cel=document.getElementById('celebracion');
   cel.classList.add('visible');
+  const _bd=document.getElementById('challenge-done');if(_bd)_bd.style.display='block';
   cel.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
