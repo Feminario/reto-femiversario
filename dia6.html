@@ -172,6 +172,18 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
 .dot.done{background:var(--azul);}
 .dot.active{background:var(--azul);width:20px;border-radius:3px;}
 .nav-label{font-size:11px;color:var(--muted);font-weight:500;}
+
+.challenge-done{margin-top:16px;}
+.cd-inner{background:linear-gradient(135deg,#2D1B4E 0%,#6B4B8A 100%);border-radius:20px;padding:24px;text-align:center;color:white;}
+.cd-check{font-size:40px;margin-bottom:8px;}
+.cd-title{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--dorado,#F7C175);}
+.cd-sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:14px;}
+.cd-tomorrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 16px;margin-bottom:12px;font-size:13px;font-weight:600;}
+.cd-clock{font-size:18px;}
+.cd-teaser{font-size:12px;color:rgba(255,255,255,.75);font-style:italic;line-height:1.6;border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:4px;}
+.club-hint{display:flex;align-items:flex-start;gap:8px;background:var(--lila-l,#F9E1FF);border-left:3px solid var(--lila,#CEA2DD);border-radius:0 10px 10px 0;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--muted,#6B6080);line-height:1.7;font-style:italic;}
+.club-hint-icon{flex-shrink:0;font-size:15px;}
+
 </style>
 </head>
 <body>
@@ -408,6 +420,8 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
     <div class="card-label">Tu reflexi&oacute;n del d&iacute;a</div>
     <div class="card-title">&iquest;C&oacute;mo te sientes con este n&uacute;mero?</div>
     <p class="card-body">Ver cu&aacute;nto necesitas y cu&aacute;nto te falta puede sentirse agobiante. O puede sentirse liberador. &iquest;Qu&eacute; te genera este ejercicio?</p>
+
+  <div class="club-hint"><span class="club-hint-icon">💜</span><span>En el Club 365 aprendemos a construir este fondo de manera inteligente — en qué tipo de cuenta guardarlo, cómo automatizarlo, y cuándo sabes que ya puedes invertir el excedente. Mañana lo verás todo unido.</span></div>
     <textarea class="reflection-area" id="reflection" placeholder="Ej: 'Me doy cuenta de que nunca hab&iacute;a separado el fondo de emergencia de mis ahorros...' / 'Me sorprend&iacute; al ver que estoy m&aacute;s cerca de lo que cre&iacute;a...'" oninput="guardarTexto()"></textarea>
     <button class="btn-primary" id="save-btn" onclick="guardar()">&#10003; Completar el D&iacute;a 6 y ganar mi punto</button>
   </div>
@@ -437,6 +451,15 @@ Ma&ntilde;ana es el &uacute;ltimo d&iacute;a del reto &#128293;
     </div>
   </div>
 
+  <div class="challenge-done" id="challenge-done" style="display:none;">
+    <div class="cd-inner">
+      <div class="cd-check">✅</div>
+      <div class="cd-title">¡Challenge completado!</div>
+      <div class="cd-sub">Día 6 de 7 — ¡lo lograste!</div>
+      <div class="cd-tomorrow"><span class="cd-clock">⏰</span><span>Nos vemos mañana a las <strong>7:00 AM</strong></span></div>
+      <div class="cd-teaser">🎂 Mañana: Día 7 — El gran final. Todos tus números se unen en un Plan Feminario personalizado que te puedes descargar. Y hay una sorpresa especial por el aniversario de Feminario.</div>
+    </div>
+  </div>
   <div class="card-menta" id="manana-card" style="display:none;">
     <div class="menta-label">Ma&ntilde;ana &middot; D&iacute;a 7 &middot; El &uacute;ltimo</div>
     <div class="card-title" style="font-size:15px;">Tu plan financiero personal. Para siempre.</div>
@@ -689,6 +712,7 @@ function guardar(){
   document.getElementById('cel-title').textContent='\u00a1Ya tienes tu red de seguridad'+(nombre?', '+nombre:'')+' !';
   const cel=document.getElementById('celebracion');
   cel.classList.add('visible');
+  const _bd=document.getElementById('challenge-done');if(_bd)_bd.style.display='block';
   cel.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
