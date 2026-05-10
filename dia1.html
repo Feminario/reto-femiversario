@@ -250,11 +250,15 @@ body { background:var(--crema-l); color:var(--texto); font-family:'Montserrat',s
     <div class="wa-steps">
       <div>
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
-        <div class="msg-box" id="wa-msg">¡Completé el Día 1 del Reto Feminversario de Feminario! 🎉
+        <div class="msg-box" id="wa-msg">¡Completé el Día 1 del Reto Feminversario! 🎉
 
-Ya sé cuánto necesito al mes para vivir la vida que quiero. Es más revelador de lo que creía 👀
+Mi nombre: <span id="wa-nombre1">—</span>
+Mi número de la libertad: <span id="wa-libertad">—</span>/mes 🧭
 
-¿Ya lo hiciste? #RetoFeminversario</div>
+El número que necesito para vivir la vida que quiero — y ya lo tengo claro.
+
+¿Ya hiciste el tuyo? ¿Cuál es?
+#RetoFeminversario</div>
         <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
       </div>
 
@@ -300,6 +304,44 @@ const WA_GRUPO = 'https://chat.whatsapp.com/BGQ1akFdvSz0zVQtjgZFxN';
 function fmt(n){ return '$\u00a0'+Math.round(n).toLocaleString('es-CO'); }
 function save(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
 function load(k){ try{return localStorage.getItem(k)||'';}catch(e){return '';} }
+
+/* ════ GOOGLE FORMS CONFIG ════
+   Para obtener los entry IDs:
+   1. Abre https://forms.gle/BRgmjzvVKjqGH7yB8
+   2. Click derecho → Ver código fuente
+   3. Ctrl+F → busca "entry."
+   4. Reemplaza los ENTRY_XXX abajo con los números reales
+*/
+const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
+const FORM_FIELDS = {
+  nombre:   'entry.501200423',
+  email:    'entry.237525753',
+  libertad: 'entry.932806817',
+  hora:     'entry.836164340',
+  potencial:'entry.741325246',
+  pension:  'entry.641892579',
+  fondo:    'entry.648858645',
+  perfil:   'entry.1876122600',
+};
+function enviarFormsData(extra){
+  try{
+    const vals = {
+      nombre:    load('femi_nombre')||'',
+      libertad:  load('femi_d1_numero')||'',
+      hora:      load('femi_d2_hora')||'',
+      potencial: load('femi_d3_potencial')||'',
+      pension:   load('femi_d4_pension')||'',
+      fondo:     load('femi_d6_meta')||'',
+      perfil:    extra||'',
+    };
+    const body = new URLSearchParams();
+    Object.entries(FORM_FIELDS).forEach(([k,entry])=>{
+      if(vals[k]) body.append(entry, vals[k]);
+    });
+    fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
+  }catch(e){}
+}
+
 
 function actualizarProgreso(){
   const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
@@ -359,6 +401,7 @@ function guardar(){
     return;
   }
   save('femi_d1_listo','1');
+  enviarFormsData('dia1');
   btn.textContent='✓ ¡Día 1 completado! +1 punto';
   btn.classList.add('saved');
   actualizarProgreso();
@@ -381,11 +424,12 @@ function calcularProyeccion(total) {
   document.getElementById('proy-renta').textContent = '$\u00a0'+Math.round(renta).toLocaleString('es-CO');
   document.getElementById('proy-anos').textContent = '20 años';
   document.getElementById('wa-libertad').textContent = '$\u00a0'+Math.round(total).toLocaleString('es-CO');
+  const wn1=document.getElementById('wa-nombre1');if(wn1)wn1.textContent=load('femi_nombre')||'';
 }
 
 window.addEventListener('load',()=>{
   const nombre=load('femi_nombre');
-  if(nombre) document.getElementById('nombre-input').value=nombre;
+  if(nombre){ document.getElementById('nombre-input').value=nombre; const wn1b=document.getElementById('wa-nombre1');if(wn1b)wn1b.textContent=nombre; }
   // Restaurar valores individuales de las categorías
   let alguno=false;
   ['v1','v2','v3','v4','v5','v6','v7','v8'].forEach(id=>{
@@ -403,6 +447,13 @@ window.addEventListener('load',()=>{
     document.getElementById('cel-title').textContent='¡Lo hiciste'+(nombre?', '+nombre:'')+'!';
     document.getElementById('celebracion').classList.add('visible');
   }
+
+    // Restaurar WA + banner al volver
+    if(load('femi_d1_listo')==='1'){
+      const _bd=document.getElementById('challenge-done');if(_bd)_bd.style.display='block';
+      const n1=parseFloat(load('femi_d1_numero'))||0;
+      const wl=document.getElementById('wa-libertad');if(wl&&n1)wl.textContent='$ '+Math.round(n1).toLocaleString('es-CO');
+    }
   actualizarProgreso();
 });
 </script>
