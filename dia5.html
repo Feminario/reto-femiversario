@@ -182,6 +182,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .dot.done{background:var(--azul);}
 .dot.active{background:var(--azul);width:20px;border-radius:3px;}
 .nav-label{font-size:11px;color:var(--muted);font-weight:500;}
+
+.challenge-done{margin-top:16px;}
+.cd-inner{background:linear-gradient(135deg,#2D1B4E 0%,#6B4B8A 100%);border-radius:20px;padding:24px;text-align:center;color:white;}
+.cd-check{font-size:40px;margin-bottom:8px;}
+.cd-title{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--dorado,#F7C175);}
+.cd-sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:14px;}
+.cd-tomorrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 16px;margin-bottom:12px;font-size:13px;font-weight:600;}
+.cd-clock{font-size:18px;}
+.cd-teaser{font-size:12px;color:rgba(255,255,255,.75);font-style:italic;line-height:1.6;border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:4px;}
+.club-hint{display:flex;align-items:flex-start;gap:8px;background:var(--lila-l,#F9E1FF);border-left:3px solid var(--lila,#CEA2DD);border-radius:0 10px 10px 0;padding:12px 14px;margin-top:12px;font-size:12px;color:var(--muted,#6B6080);line-height:1.7;font-style:italic;}
+.club-hint-icon{flex-shrink:0;font-size:15px;}
+
 </style>
 </head>
 <body>
@@ -398,15 +410,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     <div class="wa-steps">
       <div>
         <div class="wa-step-label">Paso 1 · Copia este mensaje</div>
-        <div class="msg-box" id="wa-msg">Lo hice &#9889;
+        <div class="msg-box" id="wa-msg">Lo hice ⚡
 
-Completé el Día 5 del Reto Feminversario de Feminario y tomé mi primera acción financiera real.
+Completé el Día 5 del Reto Feminversario y tomé una acción financiera real hoy.
+
+Mi acción de hoy: <span id="wa-accion5">tomé mi primera acción</span> 📲
 
 El miedo no se va esperando. Se va haciendo.
 
-¿Ya lo hiciste tú?
+¿Ya lo hiciste tú? ¡Comparte una foto de tu cuenta abierta! 📸
 #RetoFeminversario</div>
-        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">&#128203; Copiar mensaje</button>
+        <button class="btn-copy" id="copy-btn" onclick="copiarMensaje()">📋 Copiar mensaje</button>
+      <div style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:10px 14px;margin-top:8px;font-size:12px;color:#2d5a1a;font-weight:600;">
+        📸 Tip: si tomaste una captura de pantalla de tu cuenta nueva, adjúntala en el mensaje del grupo — inspira a otras a dar el paso.
+      </div>
       </div>
       <div>
         <div class="wa-step-label">Paso 2 · Ábrelo en el grupo</div>
@@ -415,6 +432,15 @@ El miedo no se va esperando. Se va haciendo.
     </div>
   </div>
 
+  <div class="challenge-done" id="challenge-done" style="display:none;">
+    <div class="cd-inner">
+      <div class="cd-check">✅</div>
+      <div class="cd-title">¡Challenge completado!</div>
+      <div class="cd-sub">Día 5 de 7 — ¡lo lograste!</div>
+      <div class="cd-tomorrow"><span class="cd-clock">⏰</span><span>Nos vemos mañana a las <strong>7:00 AM</strong></span></div>
+      <div class="cd-teaser">🛡 Mañana: Día 6 — Tu red de seguridad. Calculamos el fondo de emergencia ideal y das el primer paso real para construirlo. Porque invertir sin cimientos es construir sobre arena.</div>
+    </div>
+  </div>
   <div class="card-menta" id="manana-card" style="display:none;">
     <div class="menta-label">Mañana · Día 6</div>
     <div class="card-title" style="font-size:15px;">Tu red de seguridad.</div>
@@ -715,6 +741,7 @@ function guardar(){
     },2500);
     return;
   }
+  const waA=document.getElementById('wa-accion5');const refTxt=document.getElementById('reflection');if(waA&&refTxt&&refTxt.value)waA.textContent=refTxt.value.substring(0,60)+(refTxt.value.length>60?'...':'');
   save('femi_d5_listo','1');
   save('femi_d5_accion_texto',document.getElementById('reflection').value);
   btn.textContent='\u2713 \u00a1Día 5 completado! +1 punto';btn.classList.add('saved');
