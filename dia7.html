@@ -150,6 +150,17 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
 .pdf-pages-hidden{position:fixed;left:-9999px;top:0;z-index:-1;pointer-events:none;}
 .pdf-page-a4{width:794px;min-height:1122px;background:white;font-family:'Montserrat',sans-serif;overflow:hidden;position:relative;}
 
+
+/* DIAGNÓSTICO */
+.diag-panel{background:#fff8f0;border:1.5px solid #E8A87C;border-radius:14px;padding:16px 18px;margin-bottom:16px;}
+.diag-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b05500;margin-bottom:10px;}
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.diag-item{display:flex;align-items:center;gap:6px;font-size:12px;}
+.diag-ok{color:#4a9e6e;font-weight:700;}
+.diag-miss{color:#c05050;font-weight:700;}
+.diag-val{color:var(--muted);font-size:11px;}
+.diag-alerta{margin-top:10px;font-size:11px;color:#b05500;line-height:1.7;background:rgba(232,168,124,.1);border-radius:8px;padding:8px 10px;}
+
 </style>
 </head>
 <body>
@@ -203,6 +214,13 @@ body{background:var(--crema-l);color:var(--texto);font-family:'Montserrat',sans-
   </div>
 
   <!-- DESCARGAR PDF -->
+
+  <!-- DIAGNÓSTICO DE DATOS -->
+  <div class="diag-panel" id="diag-panel" style="display:none;">
+    <div class="diag-title">⚠ Datos incompletos — esto es lo que tenemos</div>
+    <div class="diag-grid" id="diag-grid"></div>
+    <div class="diag-alerta" id="diag-alerta"></div>
+  </div>
   <button class="btn-pdf" id="btn-pdf" onclick="generarPDF()">
     &#128196; Descargar mi Plan Feminario en PDF
   </button>
@@ -308,7 +326,7 @@ Ahora s&eacute; a d&oacute;nde voy. &#128200;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
-function load(k){try{return localStorage.getItem(k)||'';}
+function load(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
 
 const FORM_ENDPOINT = 'https://docs.google.com/forms/d/e/1FAIpQLSeOC6qMzf12EXB2WwXyoDkch0JS3oaDVTy-6In3sdMsLZfnfw/formResponse';
 const FORM_FIELDS = {
@@ -330,7 +348,7 @@ function enviarFormsData(extra){
     Object.entries(FORM_FIELDS).forEach(([k,entry])=>{if(vals[k])body.append(entry,vals[k]);});
     fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body});
   }catch(e){}
-}catch(e){return '';}}
+}
 function fmt(n){if(!n||isNaN(n))return '\u2014';return '$\u00a0'+Math.round(n).toLocaleString('es-CO');}
 function fmtC(n){if(!n||isNaN(n))return '\u2014';if(n>=1e9)return '$\u00a0'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return '$\u00a0'+(n/1e6).toFixed(1)+'M';return fmt(n);}
 
@@ -766,6 +784,8 @@ async function generarPDF(){
   btn.textContent = '⏳ Generando tu plan...';
 
   const d = cargarDatos();
+  // Nunca bloquear — generar con lo que haya disponible
+  try {
   const perfil = calcularPerfil(d);
   const t = TAROT[perfil];
 
@@ -867,18 +887,38 @@ async function generarPDF(){
   btn.textContent='✅ Descargado — revisa tu carpeta de Descargas';
   btn.classList.remove('generating');
   btn.style.background='var(--menta)'; btn.style.color='var(--texto)';
+  } catch(err) {
+    console.error('PDF error:', err);
+    btn.classList.remove('generating');
+    btn.textContent='⚠ Error — abre en otro navegador (no incógnito)';
+    btn.style.background='#c05050';
+    setTimeout(()=>{btn.textContent='🔄 Intentar de nuevo';btn.style.background='';},4000);
+  }
 }
 
 /* ════ PROGRESO + GUARDAR ════ */
+function diaCompletado(key, fallbacks){
+  if(load(key)==='1') return true;
+  if(fallbacks) return fallbacks.some(f=>load(f)==='1');
+  return false;
+}
 function actualizarProgreso(){
-  const dias=['femi_d1_listo','femi_d2_listo','femi_d3_listo','femi_d4_listo','femi_d5_listo','femi_d6_listo','femi_d7_listo'];
-  const pts=dias.filter(d=>load(d)==='1').length;
+  const dias=[
+    {k:'femi_d1_listo'},
+    {k:'femi_d2_listo'},
+    {k:'femi_d3_listo', alt:['femi_d3_guardado']},
+    {k:'femi_d4_listo'},
+    {k:'femi_d5_listo', alt:['femi_d5_guardado']},
+    {k:'femi_d6_listo'},
+    {k:'femi_d7_listo'},
+  ];
+  const pts=dias.filter(({k,alt})=>diaCompletado(k,alt)).length;
   document.getElementById('progress-fill').style.width=(pts/7*100)+'%';
   document.getElementById('progress-pts').textContent=pts+'/7 \u2b50';
-  dias.forEach((d,i)=>{
+  dias.forEach(({k,alt},i)=>{
     const c=document.getElementById('chip'+(i+1));if(!c)return;
-    if(load(d)==='1'){c.classList.add('done');c.classList.remove('active');c.textContent='\u2713';}
-    else if(i===6&&load(d)!=='1'){c.classList.add('active');}
+    if(diaCompletado(k,alt)){c.classList.add('done');c.classList.remove('active');c.textContent='\u2713';}
+    else if(i===6&&!diaCompletado(k,alt)){c.classList.add('active');}
   });
 }
 function guardarTexto(){save('femi_d7_reflexion',document.getElementById('reflection').value);}
@@ -923,6 +963,44 @@ function enviarAGoogleForms(d){
   fetch(URL, {method:'POST', mode:'no-cors', body}).catch(()=>{});
 }
 
+
+/* ════ DIAGNÓSTICO DE DATOS ════ */
+function mostrarDiagnostico(){
+  const d = cargarDatos();
+  const checks = [
+    {label:'Número de libertad', val:d.libertad, fmt:v=>v>0?'$ '+Math.round(v).toLocaleString('es-CO'):null},
+    {label:'Valor de tu hora',   val:d.hora,      fmt:v=>v>0?'$ '+Math.round(v).toLocaleString('es-CO'):null},
+    {label:'Potencial económico',val:d.potencial, fmt:v=>v>0?(v>=1e9?(v/1e9).toFixed(1)+' B':(v/1e6).toFixed(0)+' M'):null},
+    {label:'Pensión estimada',   val:d.pension,   fmt:v=>v>0?'$ '+Math.round(v).toLocaleString('es-CO'):null},
+    {label:'Fondo de autonomía', val:d.d6_meta,   fmt:v=>v>0?'$ '+Math.round(v).toLocaleString('es-CO'):null},
+    {label:'Tu nombre',          val:d.nombre,    fmt:v=>v||null},
+  ];
+  const faltantes = checks.filter(c=>!c.fmt(c.val));
+  const ok = checks.filter(c=>c.fmt(c.val));
+  
+  if(faltantes.length===0) return; // Todo bien, no mostrar panel
+  
+  const panel = document.getElementById('diag-panel');
+  const grid = document.getElementById('diag-grid');
+  const alerta = document.getElementById('diag-alerta');
+  
+  if(!panel||!grid) return;
+  panel.style.display='block';
+  
+  grid.innerHTML = checks.map(c=>{
+    const v = c.fmt(c.val);
+    return v
+      ? '<div class="diag-item"><span class="diag-ok">✓</span><span>'+c.label+'</span><span class="diag-val">'+v+'</span></div>'
+      : '<div class="diag-item"><span class="diag-miss">!</span><span style="color:#c05050;">'+c.label+'</span></div>';
+  }).join('');
+  
+  if(faltantes.length>0){
+    alerta.innerHTML = faltantes.length===checks.length
+      ? '⚠ No hay datos de los días anteriores. Asegúrate de abrir esta página desde el mismo navegador y dispositivo que usaste durante el reto.'
+      : '⚠ Falta información de '+faltantes.map(f=>f.label.toLowerCase()).join(', ')+'. El plan se generará con los datos disponibles — los campos faltantes aparecerán como "—". Puedes volver al día correspondiente para completarlo.';
+  }
+}
+
 window.addEventListener('load',()=>{
   actualizarProgreso();
   const d = cargarDatos();
@@ -930,6 +1008,7 @@ window.addEventListener('load',()=>{
   renderPlan(d, t_data);
   renderHorizontes(d, t_data);
   renderGrafica(d);
+  mostrarDiagnostico();
   const r=load('femi_d7_reflexion');
   if(r) document.getElementById('reflection').value=r;
   if(load('femi_d7_listo')==='1'){
